@@ -73,7 +73,10 @@ export async function POST(request: Request) {
       })
       .select("id,original_name,size_bytes,status,created_at")
       .single();
-    if (error || !video) return NextResponse.json({ error: "영상 정보를 저장하지 못했습니다." }, { status: 500 });
+    if (error || !video) {
+      console.error("VIDEO_INSERT_FAILED", error);
+      return NextResponse.json({ error: `영상 정보를 저장하지 못했습니다: ${error?.message ?? "unknown"}` }, { status: 500 });
+    }
     return NextResponse.json({ video }, { status: 201 });
   } catch (cause) {
     console.error("VIDEO_SAVE_FAILED", cause);
