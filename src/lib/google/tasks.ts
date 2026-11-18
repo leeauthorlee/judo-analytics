@@ -67,6 +67,9 @@ export async function enqueueAnalysisTask(analysisId: string) {
     signal: AbortSignal.timeout(10_000),
   });
   if (response.status === 409) return true;
-  if (!response.ok) throw new Error(`Google Cloud Tasks rejected the job: ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Google Cloud Tasks rejected the job: ${response.status} ${detail}`);
+  }
   return true;
 }
