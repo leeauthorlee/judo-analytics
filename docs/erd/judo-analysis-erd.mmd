@@ -1,0 +1,278 @@
+---
+title: Judo Video Analysis Agent — Logical ERD
+---
+erDiagram
+    APP_USER {
+        uuid user_id PK
+        string email UK
+        string display_name
+        datetime created_at
+    }
+
+    OAUTH_IDENTITY {
+        uuid identity_id PK
+        uuid user_id FK
+        string provider
+        string provider_subject
+        datetime linked_at
+    }
+
+    GUEST_SESSION {
+        uuid guest_session_id PK
+        string session_token_hash UK
+        datetime created_at
+        datetime last_seen_at
+        datetime expires_at
+    }
+
+    WORKSPACE {
+        uuid workspace_id PK
+        uuid user_id FK
+        uuid guest_session_id FK
+        datetime created_at
+    }
+
+    VIDEO_ASSET {
+        uuid video_id PK
+        uuid workspace_id FK
+        string storage_key UK
+        string original_name
+        string source_type
+        string source_reference
+        int size_bytes
+        int duration_ms
+        int width
+        int height
+        string status
+        datetime created_at
+        datetime deleted_at
+    }
+
+    VIDEO_RIGHTS {
+        uuid rights_id PK
+        uuid video_id FK
+        uuid checked_by_user_id FK
+        string rights_holder
+        string license_reference
+        string territory
+        boolean allowed_training
+        boolean allowed_cloud_processing
+        string clearance_status
+        datetime valid_until
+    }
+
+    RULESET {
+        uuid ruleset_id PK
+        string name
+        string version
+        string source_url
+        date effective_from
+        date effective_to
+    }
+
+    TECHNIQUE {
+        uuid technique_id PK
+        string kodokan_code UK
+        string name_ko
+        string name_en
+        string category
+        boolean is_active
+    }
+
+    MODEL_VERSION {
+        uuid model_version_id PK
+        uuid training_run_id FK
+        string purpose
+        string model_name
+        string version
+        string artifact_uri
+        string status
+        datetime created_at
+    }
+
+    VIDEO_ANALYSIS {
+        uuid analysis_id PK
+        uuid video_id FK
+        uuid model_version_id FK
+        uuid ruleset_id FK
+        string status
+        datetime started_at
+        datetime completed_at
+    }
+
+    POSE_EXTRACTION {
+        uuid pose_extraction_id PK
+        uuid video_id FK
+        uuid model_version_id FK
+        string status
+        string keypoint_schema_version
+        float extraction_fps
+        datetime created_at
+    }
+
+    POSE_TRACK {
+        uuid pose_track_id PK
+        uuid pose_extraction_id FK
+        string anonymous_track_key
+        string role_or_color
+        float tracking_confidence
+    }
+
+    POSE_ARTIFACT {
+        uuid pose_artifact_id PK
+        uuid pose_track_id FK
+        string storage_key
+        string format
+        string checksum
+        int start_ms
+        int end_ms
+    }
+
+    TRANSCRIPT_SEGMENT {
+        uuid transcript_segment_id PK
+        uuid video_id FK
+        int start_ms
+        int end_ms
+        string speaker_role
+        string text
+        string language
+        string extraction_source
+    }
+
+    ANALYSIS_EVENT {
+        uuid event_id PK
+        uuid analysis_id FK
+        uuid technique_id FK
+        uuid tori_track_id FK
+        uuid uke_track_id FK
+        int start_ms
+        int end_ms
+        float detection_confidence
+    }
+
+    EVENT_ASSESSMENT {
+        uuid assessment_id PK
+        uuid event_id FK
+        uuid ruleset_id FK
+        uuid reviewer_user_id FK
+        string assessment_source
+        string score_label
+        float confidence
+        string evidence_json
+        string review_status
+        datetime created_at
+    }
+
+    TRAINING_DATASET {
+        uuid dataset_id PK
+        uuid ruleset_id FK
+        string name
+        string version
+        string status
+        datetime created_at
+    }
+
+    DATASET_SAMPLE {
+        uuid sample_id PK
+        uuid dataset_id FK
+        uuid video_id FK
+        uuid rights_id FK
+        uuid pose_artifact_id FK
+        int start_ms
+        int end_ms
+        string split
+        string review_status
+    }
+
+    TRAINING_LABEL {
+        uuid label_id PK
+        uuid sample_id FK
+        uuid technique_id FK
+        uuid ruleset_id FK
+        uuid transcript_segment_id FK
+        uuid reviewer_user_id FK
+        int event_start_ms
+        int event_end_ms
+        string target_type
+        string score_label
+        string label_source
+        string review_status
+    }
+
+    TRAINING_RUN {
+        uuid training_run_id PK
+        uuid dataset_id FK
+        uuid base_model_version_id FK
+        string code_revision
+        string parameters_json
+        string metrics_json
+        string status
+        datetime started_at
+        datetime completed_at
+    }
+
+    DIARY_ENTRY {
+        uuid diary_entry_id PK
+        uuid workspace_id FK
+        date entry_date
+        string title
+        string note
+        datetime created_at
+    }
+
+    HIGHLIGHT {
+        uuid highlight_id PK
+        uuid video_id FK
+        uuid event_id FK
+        int start_ms
+        int end_ms
+        string title
+        string note
+        string thumbnail_key
+        datetime created_at
+    }
+
+    DIARY_ENTRY_HIGHLIGHT {
+        uuid highlight_id PK, FK
+        uuid diary_entry_id FK
+        int sort_order
+    }
+
+    APP_USER ||--o{ OAUTH_IDENTITY : "로그인 연결"
+    APP_USER ||--o{ WORKSPACE : "회원 공간"
+    GUEST_SESSION ||--|| WORKSPACE : "비회원 공간"
+    WORKSPACE ||--o{ VIDEO_ASSET : "보관"
+    VIDEO_ASSET ||--o{ VIDEO_RIGHTS : "권리 기록"
+    APP_USER o|--o{ VIDEO_RIGHTS : "확인자"
+    VIDEO_ASSET ||--o{ VIDEO_ANALYSIS : "분석 요청"
+    MODEL_VERSION ||--o{ VIDEO_ANALYSIS : "분석 모델"
+    RULESET ||--o{ VIDEO_ANALYSIS : "적용 규정"
+    VIDEO_ANALYSIS ||--o{ ANALYSIS_EVENT : "검출 장면"
+    TECHNIQUE o|--o{ ANALYSIS_EVENT : "기술 분류"
+    POSE_TRACK o|--o{ ANALYSIS_EVENT : "던지는 선수"
+    POSE_TRACK o|--o{ ANALYSIS_EVENT : "방어 선수"
+    ANALYSIS_EVENT ||--o{ EVENT_ASSESSMENT : "판정 근거"
+    RULESET ||--o{ EVENT_ASSESSMENT : "판정 기준"
+    APP_USER o|--o{ EVENT_ASSESSMENT : "전문가 검토"
+    VIDEO_ASSET ||--o{ POSE_EXTRACTION : "자세 추출"
+    MODEL_VERSION ||--o{ POSE_EXTRACTION : "관절 모델"
+    POSE_EXTRACTION ||--o{ POSE_TRACK : "선수 트랙"
+    POSE_TRACK ||--o{ POSE_ARTIFACT : "시계열 파일"
+    VIDEO_ASSET ||--o{ TRANSCRIPT_SEGMENT : "해설 구간"
+    TRAINING_DATASET ||--o{ DATASET_SAMPLE : "포함 샘플"
+    VIDEO_ASSET ||--o{ DATASET_SAMPLE : "원본 영상"
+    VIDEO_RIGHTS ||--o{ DATASET_SAMPLE : "학습 권한"
+    POSE_ARTIFACT o|--o{ DATASET_SAMPLE : "관절 입력"
+    DATASET_SAMPLE ||--o{ TRAINING_LABEL : "정답 라벨"
+    TECHNIQUE o|--o{ TRAINING_LABEL : "기술 라벨"
+    RULESET ||--o{ TRAINING_LABEL : "라벨 규정"
+    TRANSCRIPT_SEGMENT o|--o{ TRAINING_LABEL : "약한 근거"
+    APP_USER o|--o{ TRAINING_LABEL : "라벨 검토자"
+    TRAINING_DATASET ||--o{ TRAINING_RUN : "학습 실행"
+    MODEL_VERSION o|--o{ TRAINING_RUN : "초기 가중치"
+    TRAINING_RUN o|--o{ MODEL_VERSION : "산출 버전"
+    WORKSPACE ||--o{ DIARY_ENTRY : "일기"
+    VIDEO_ASSET ||--o{ HIGHLIGHT : "하이라이트"
+    ANALYSIS_EVENT o|--o{ HIGHLIGHT : "분석 장면에서 생성"
+    DIARY_ENTRY ||--o{ DIARY_ENTRY_HIGHLIGHT : "포함"
+    HIGHLIGHT ||--o| DIARY_ENTRY_HIGHLIGHT : "하나의 일기에 추가"

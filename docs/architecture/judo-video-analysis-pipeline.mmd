@@ -1,0 +1,110 @@
+---
+title: Judo Analytics — Detailed Video Analysis and Model Lifecycle
+config:
+  layout: elk
+---
+flowchart LR
+    subgraph inputs[Input and Rights]
+        uservideo[User MP4 upload<br/>Private Blob]
+        ytsearch[YouTube Data API<br/>Search metadata only]
+        candidate[Candidate record<br/>Video ID · title · channel · URL]
+        licensed[Owned / licensed video<br/>File supplied under explicit rights]
+        approval{Training and processing<br/>rights confirmed?}
+        ytsearch --> candidate
+        candidate -.->|Candidate discovery only| approval
+        licensed --> approval
+        uservideo -->|Inference only unless separately opted in and cleared| approval
+    end
+
+    subgraph preparation[Video Preparation]
+        inspect[FFprobe<br/>Container · codec · duration · FPS · rotation]
+        valid{Valid MP4?<br/>≤500 MB · ≤10 min}
+        decode[FFmpeg decode / normalize<br/>Preserve source timestamps]
+        windows[Temporal clip windows<br/>Event context before and after action]
+        inspect --> valid
+        valid -->|Yes| decode --> windows
+        valid -->|No| reject[Reject with actionable reason]
+    end
+
+    uservideo --> inspect
+    approval -->|Approved for training| inspect
+
+    subgraph pose[Pose and Motion Features]
+        person[Person detection and tracking<br/>Anonymous bout-local IDs]
+        keypoints[Per-frame body keypoints<br/>Joint x/y + confidence + timestamp]
+        tracks[Temporal pose tracks<br/>Role/side · occlusion · track confidence]
+        artifacts[Pose artifacts in object storage<br/>JSONL / Parquet · schema version · checksum]
+        windows --> person --> keypoints --> tracks --> artifacts
+    end
+
+    subgraph labels[Expert Labels and Dataset]
+        sources[Evidence sources<br/>Official result · referee call · expert review]
+        weak[Title / commentary / transcript<br/>Weak label suggestions only]
+        review[Operator reviews / corrects<br/>Expert qualification policy TBD]
+        labelsset[Event labels<br/>Start/end · technique · tori/uke · rule-set<br/>score · evidence · uncertainty]
+        splits[Versioned dataset<br/>Train / validation / test by entire bout/source]
+        sources --> review
+        weak -.->|Never treat as ground truth automatically| review
+        review --> labelsset --> splits
+    end
+
+    artifacts --> labelsset
+    approval -->|Approved license record| splits
+
+    subgraph training[Training Lifecycle — Not Implemented]
+        base[Pretrained temporal video/pose model<br/>Architecture/provider TBD]
+        fine[Fine-tune classifier / temporal localizer<br/>Framework TBD · Vercel Daemon 검토<br/>GPU 지원 확인 필요]
+        eval[Held-out evaluation<br/>Technique F1 · per-score false positives<br/>event localization · abstention / coverage]
+        registry[Versioned model artifact<br/>Model · data · rules · code revision · metrics]
+        deploymodel[Operator approves model version<br/>Staging before production]
+        base --> fine --> eval --> registry --> deploymodel
+    end
+
+    splits --> fine
+
+    subgraph inference[Per-Video Inference]
+        temporal[Pose/motion sequence analysis<br/>Detect candidate action windows]
+        classify[Technique and event classifier<br/>Known technique or unknown]
+        cues[Visual cues per event<br/>Continuity · landing · control · visibility]
+        rules[Ruleset-aware score assessment<br/>Ippon · waza-ari · yuko* · no-score]
+        confidence{Evidence sufficient<br/>and confidence accepted?}
+        uncertain[Mark uncertain / review needed<br/>Do not invent a score]
+        output[Timestamped analysis events<br/>Technique · score candidate · evidence<br/>model/rule version]
+        temporal --> classify --> cues --> rules --> confidence
+        confidence -->|Yes| output
+        confidence -->|No| uncertain --> output
+    end
+
+    artifacts --> temporal
+    deploymodel -.-> classify
+
+    subgraph product[Product Output]
+        result[Persist result in DB<br/>Linked to video and model version]
+        clips[Create / edit highlight clips]
+        diary[Attach highlights to one diary entry<br/>Member or guest workspace]
+        result --> clips --> diary
+    end
+
+    output --> result
+    uservideo --> result
+
+    subgraph caveats[Important Constraints]
+        rulesnote[Pin the applicable IJF senior ruleset<br/>Exact edition still TBD]
+        sourceNote[YouTube metadata search does not authorize<br/>video download, frame extraction, or training]
+        scoresNote[AI score is a candidate, not an official referee decision<br/>MVP does not calculate final match winner]
+        ocrNote[Scoreboard OCR / referee signal recognition<br/>Deferred beyond MVP]
+    end
+
+    rules -.-> rulesnote
+    candidate -.-> sourceNote
+    output -.-> scoresNote
+    rules -.-> ocrNote
+
+    classDef confirmed fill:#E7F6EC,stroke:#8BCB9F,color:#1B1F24
+    classDef proposed fill:#EEF4FF,stroke:#9DB8F2,color:#1B1F24
+    classDef undecided fill:#FFF6E0,stroke:#E8C36A,color:#1B1F24
+    classDef caution fill:#FDECEC,stroke:#EBA3A3,color:#1B1F24
+    class uservideo,output,diary confirmed
+    class inspect,decode,windows,person,keypoints,tracks,artifacts,labelsset,splits,temporal,classify,cues,rules,result,clips proposed
+    class approval,review,base,fine,eval,registry,deploymodel,confidence,ytsearch,licensed undecided
+    class reject,uncertain,candidate,weak,rulesnote,sourceNote,scoresNote caution

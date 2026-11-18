@@ -1,0 +1,87 @@
+---
+title: Judo Analytics — Technology Stack and Runtime Architecture
+config:
+  layout: elk
+---
+flowchart LR
+    user[회원 / 비회원] --> browser
+
+    subgraph client[Client]
+        browser[Browser]
+        webui[Next.js App Router<br/>React + TypeScript<br/>Upload · Video · Diary UI]
+        browser <--> webui
+    end
+
+    subgraph vercel[Vercel — Web and Control Plane]
+        routes[Next.js Route Handlers<br/>Auth · Upload token · Analysis API]
+        appauth[OAuth integration<br/>Google · Kakao · Naver]
+        routes --> appauth
+    end
+
+    webui <-->|HTTPS| routes
+
+    subgraph media[Private Media Storage]
+        blob[Vercel Blob private<br/>Original MP4 · thumbnails]
+        posefiles[Object storage<br/>Pose JSONL / Parquet artifacts<br/>Provider TBD]
+    end
+
+    webui -->|Direct upload after scoped token| blob
+    routes -->|Create asset / issue upload token| blob
+
+    subgraph persistence[Application Data]
+        db[(Supabase PostgreSQL<br/>User · Workspace · Video · Analysis · Diary · Dataset metadata)]
+        queue[Job queue<br/>Provider TBD]
+    end
+
+    routes <--> db
+    routes -->|Enqueue long analysis| queue
+
+    subgraph worker[Video and ML Workers — Vercel Daemon 검토]
+        workerapi[Vercel Daemon candidate<br/>Runtime / quota / GPU 지원 확인 필요<br/>GPU 외부 fallback TBD]
+        mediaCheck[FFprobe validation<br/>Codec · duration · FPS · rotation]
+        normalize[FFmpeg preprocessing<br/>Timeline-preserving decode]
+        pose[Pose / person tracking model<br/>Framework and checkpoint TBD]
+        classifier[Temporal judo model<br/>Technique + event localization]
+        scorer[Rule-aware score assessment<br/>Confidence / abstain gate]
+        queue --> workerapi
+        workerapi --> mediaCheck --> normalize --> pose --> classifier --> scorer
+    end
+
+    workerapi -->|Read source| blob
+    pose -->|Write keypoint tracks| posefiles
+    scorer -->|Events · evidence · version IDs| db
+    webui -->|Poll result/status| routes
+
+    subgraph training[Offline Training and Dataset Operations — Not Implemented]
+        ytmeta[YouTube Data API<br/>Metadata candidates only]
+        owned[Owned or explicitly licensed<br/>video files]
+        rights[Rights clearance gate<br/>Training permission required]
+        annotation[Expert annotation<br/>Events · technique · rule-set · score]
+        dataset[Versioned dataset<br/>Split by bout/source]
+        train[Training worker<br/>Framework TBD<br/>Vercel Daemon 검토 · GPU 지원 확인 필요]
+        evaluation[Held-out evaluation<br/>Per-class metrics · false score rate<br/>localization · abstention]
+        registry[Model artifact registry<br/>Version · code · data · metrics]
+        ytmeta -.->|No video download / no training| rights
+        owned --> rights --> annotation --> dataset --> train --> evaluation --> registry
+    end
+
+    registry -.->|Approved checkpoint / adapter| classifier
+
+    subgraph delivery[Delivery]
+        github[Git repository / CI<br/>Provider TBD]
+        deploy[Vercel deployment]
+        github --> deploy
+    end
+
+    deploy -.-> webui
+
+    current[Current code: UI + shared-password prototype + Blob upload skeleton + empty model adapter<br/>OAuth · database · queue · workers · trained model are not connected]:::note
+    current -.-> routes
+
+    classDef confirmed fill:#E7F6EC,stroke:#8BCB9F,color:#1B1F24
+    classDef proposed fill:#EEF4FF,stroke:#9DB8F2,color:#1B1F24
+    classDef undecided fill:#FFF6E0,stroke:#E8C36A,color:#1B1F24
+    classDef note fill:#F2F4F7,stroke:#B8C0CC,color:#1B1F24
+    class webui,blob,deploy confirmed
+    class routes,db,queue,workerapi,posefiles,pose,classifier,scorer,train,registry,github proposed
+    class appauth,mediaCheck,normalize,ytmeta,owned,rights,annotation,dataset,evaluation undecided
