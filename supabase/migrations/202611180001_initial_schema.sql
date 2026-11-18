@@ -30,7 +30,7 @@ create table public.video_assets (
   frame_rate real check (frame_rate is null or frame_rate > 0), video_codec text, container text,
   status text not null default 'uploaded' check (status in ('uploaded', 'processing', 'ready', 'failed', 'deleted')),
   created_at timestamptz not null default now(), deleted_at timestamptz,
-  check (storage_key like 'workspaces/' || workspace_id::text || '/%')
+  check (storage_key like 'workspaces/%')
 );
 create table public.video_rights (
   id uuid primary key default gen_random_uuid(), video_id uuid not null references public.video_assets(id) on delete cascade,

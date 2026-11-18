@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { head } from "@vercel/blob";
 import SiteHeader from "@/app/components/site-header";
 import HomeClient from "@/app/home-client";
 import { createClient } from "@/lib/supabase/server";
@@ -43,15 +42,9 @@ export default async function Home() {
         diaries = await getDiaries(supabase, workspace.id);
 
         const thumbnailUrls = new Map<string, string>();
-        if (process.env.BLOB_READ_WRITE_TOKEN) {
-          for (const item of highlights) {
-            if (!item.thumbnail_key) continue;
-            try {
-              const blob = await head(item.thumbnail_key, { token: process.env.BLOB_READ_WRITE_TOKEN });
-              thumbnailUrls.set(item.id, blob.downloadUrl);
-            } catch {
-              // 썸네일을 읽을 수 없으면 표시하지 않습니다.
-            }
+        for (const item of highlights) {
+          if (item.thumbnail_key) {
+            thumbnailUrls.set(item.id, `/api/blob/thumbnail?key=${encodeURIComponent(item.thumbnail_key)}`);
           }
         }
         const diaryThumbnails = new Map<string, string>();
