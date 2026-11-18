@@ -1,8 +1,8 @@
 import type { JudoAnalysisProvider } from "@/lib/analysis/types";
 
 /**
- * Register a reviewed, trained model adapter here when it is ready.
- * Training/data ingestion is deliberately not implemented in this project yet.
+ * Inference runs in worker/analysis-provider.js, never inside a Vercel request.
+ * This legacy in-process provider is intentionally unavailable.
  */
 export function getJudoAnalysisProvider(): JudoAnalysisProvider | null {
   return null;

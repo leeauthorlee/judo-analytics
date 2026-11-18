@@ -1,0 +1,1113 @@
+[
+  {
+    "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.40.06.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "o_goshi",
+    "scores": [
+      0.16380451619625092,
+      0.8141218423843384,
+      0.021463319659233093,
+      0.0006103374762460589
+    ]
+  },
+  {
+    "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.16.03.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.15369455516338348,
+      0.32814252376556396,
+      0.4926931858062744,
+      0.025469668209552765
+    ]
+  },
+  {
+    "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.12.54.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.9933927655220032,
+      0.0019670743495225906,
+      0.00010899926564889029,
+      0.004531185608357191
+    ]
+  },
+  {
+    "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.22.54.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.8999682664871216,
+      0.03923122212290764,
+      0.00383771862834692,
+      0.05696289613842964
+    ]
+  },
+  {
+    "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 12.53.12.mp4",
+    "label": "o_goshi",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.22940638661384583,
+      0.21837937831878662,
+      0.2873278558254242,
+      0.26488643884658813
+    ]
+  },
+  {
+    "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.15.41.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.0003736108192242682,
+      0.04809119924902916,
+      0.9213820099830627,
+      0.030153151601552963
+    ]
+  },
+  {
+    "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 01.11.10.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.4101935923099518,
+      0.10060656815767288,
+      0.47804132103919983,
+      0.011158455163240433
+    ]
+  },
+  {
+    "path": "data/raw/test/uchi_mata/Screen Recording 2025-03-15 at 13.50.00.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.006267130840569735,
+      0.01925988309085369,
+      0.02860652282834053,
+      0.9458664655685425
+    ]
+  },
+  {
+    "path": "data/raw/test/uchi_mata/Screen Recording 2025-03-15 at 14.55.55.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.14603498578071594,
+      0.027246393263339996,
+      0.005303492303937674,
+      0.8214150667190552
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.07.05.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.08140380680561066,
+      0.003968385048210621,
+      0.07257387787103653,
+      0.8420539498329163
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.07.58.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.09686759859323502,
+      0.005823773797601461,
+      0.09002164751291275,
+      0.8072869777679443
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.19.20.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.10431328415870667,
+      0.40500253438949585,
+      0.4425390362739563,
+      0.04814515635371208
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.29.09.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.9161155223846436,
+      0.009138555265963078,
+      0.003998486790806055,
+      0.07074741274118423
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.31.15.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.8132196664810181,
+      0.004796138498932123,
+      0.007275103125721216,
+      0.17470906674861908
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.42.43.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.5450330376625061,
+      0.06493809819221497,
+      0.3634471595287323,
+      0.026581717655062675
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.44.47.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.08086287975311279,
+      0.0213596411049366,
+      0.8951478004455566,
+      0.002629621885716915
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.46.59.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.3215302526950836,
+      0.2552831470966339,
+      0.4129980802536011,
+      0.01018852274864912
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.03.08.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "osoto_gari",
+    "scores": [
+      5.8571451518218964e-05,
+      0.0002615941339172423,
+      0.999426007270813,
+      0.0002539409033488482
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.08.31.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.8951215147972107,
+      0.011745682917535305,
+      0.0014439544174820185,
+      0.09168893098831177
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.41.44.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.988934338092804,
+      0.004283406771719456,
+      0.0019613727927207947,
+      0.004820940550416708
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 12.42.48.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "o_goshi",
+    "scores": [
+      0.05118158459663391,
+      0.8095613121986389,
+      0.04588961973786354,
+      0.09336759895086288
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 12.48.51.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.005595888011157513,
+      0.02631806768476963,
+      0.16205179691314697,
+      0.8060342669487
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 12.49.59.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.004005907103419304,
+      0.002220348222181201,
+      0.33233240246772766,
+      0.6614413261413574
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 14.22.13.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.09294981509447098,
+      0.0037899024318903685,
+      0.31764864921569824,
+      0.5856116414070129
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 14.27.58.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.7091715335845947,
+      0.00926104374229908,
+      0.1514396220445633,
+      0.13012774288654327
+    ]
+  },
+  {
+    "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-03-16 at 14.28.47.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.88979572057724,
+      0.002391023328527808,
+      0.00485175522044301,
+      0.10296151041984558
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 12.56.16.mp4",
+    "label": "o_goshi",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.021972643211483955,
+      0.3201550543308258,
+      0.5429878234863281,
+      0.11488449573516846
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 12.57.29.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.06517080217599869,
+      0.9070351719856262,
+      0.026324035599827766,
+      0.0014699716120958328
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.02.44.mp4",
+    "label": "o_goshi",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.6332347989082336,
+      0.1515224575996399,
+      0.04249383509159088,
+      0.1727488487958908
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.04.35.mp4",
+    "label": "o_goshi",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.027150709182024002,
+      0.0026673362590372562,
+      0.00043199065839871764,
+      0.9697499871253967
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.07.41.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.0701444074511528,
+      0.6591519117355347,
+      0.12069300562143326,
+      0.15001069009304047
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.26.28.mp4",
+    "label": "o_goshi",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.17138829827308655,
+      0.15778104960918427,
+      0.026859311386942863,
+      0.6439713835716248
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.34.19.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.009124397300183773,
+      0.7757871150970459,
+      0.20051224529743195,
+      0.014576263725757599
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.36.06.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.003146472154185176,
+      0.9478020071983337,
+      0.049030791968107224,
+      2.0681482055806555e-05
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.11.39.mp4",
+    "label": "o_goshi",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.15494176745414734,
+      0.20788529515266418,
+      0.6175259947776794,
+      0.019646933302283287
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.46.08.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.00933729950338602,
+      0.8269360661506653,
+      0.1491532027721405,
+      0.014573457650840282
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 15.00.03.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.0010382585460320115,
+      0.980732262134552,
+      0.018215319141745567,
+      1.4121404092293233e-05
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 15.10.37.mp4",
+    "label": "o_goshi",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0010285539319738746,
+      0.050111036747694016,
+      0.0002943940635304898,
+      0.9485659599304199
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-03-16 at 12.09.38.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.024259833618998528,
+      0.925545334815979,
+      0.017266258597373962,
+      0.03292866423726082
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-03-16 at 12.15.58.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      3.834388553514145e-05,
+      0.9999334812164307,
+      2.4770486561465077e-05,
+      3.303796120235347e-06
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-03-16 at 12.17.23.mp4",
+    "label": "o_goshi",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.04215434566140175,
+      0.12647651135921478,
+      0.001547609455883503,
+      0.8298215270042419
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/Screen Recording 2025-03-16 at 12.30.11.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.04106137156486511,
+      0.6644248962402344,
+      0.05336413532495499,
+      0.24114958941936493
+    ]
+  },
+  {
+    "path": "data/raw/train/o_goshi/ScreenRecording2025-02-01at13.38.37-ezgif.com-video-speed.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.03467528149485588,
+      0.9629630446434021,
+      0.0022045595105737448,
+      0.00015711941523477435
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.33.09.mp4",
+    "label": "osoto_gari",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0392538346350193,
+      0.062494102865457535,
+      0.3882578909397125,
+      0.5099941492080688
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.38.00.mp4",
+    "label": "osoto_gari",
+    "prediction": "o_goshi",
+    "scores": [
+      0.046170786023139954,
+      0.8397927284240723,
+      0.03724687546491623,
+      0.07678958773612976
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.50.35.mp4",
+    "label": "osoto_gari",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.024679435417056084,
+      0.17024463415145874,
+      0.25711965560913086,
+      0.5479562878608704
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.59.59.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.010165437124669552,
+      0.014333094470202923,
+      0.7578044533729553,
+      0.21769706904888153
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.00.57.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.0016287758480757475,
+      0.0037334072403609753,
+      0.9178162217140198,
+      0.07682164758443832
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.01.59.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.00015096318384166807,
+      0.013230027630925179,
+      0.9865216016769409,
+      9.750467143021524e-05
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.08.50.mp4",
+    "label": "osoto_gari",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.4856759011745453,
+      0.030321761965751648,
+      0.030241752043366432,
+      0.45376056432724
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.09.18.mp4",
+    "label": "osoto_gari",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.49207037687301636,
+      0.1353159248828888,
+      0.04059210792183876,
+      0.332021564245224
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.15.21.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.03582329303026199,
+      0.11744509637355804,
+      0.45242562890052795,
+      0.3943060338497162
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 20.04.01.mp4",
+    "label": "osoto_gari",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.9200280904769897,
+      0.007583224214613438,
+      0.06927140802145004,
+      0.0031172859016805887
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.26.20.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.1794949620962143,
+      0.03393111005425453,
+      0.7023496031761169,
+      0.08422437310218811
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.27.51.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.012846073135733604,
+      0.0056717246770858765,
+      0.9763723015785217,
+      0.005109837278723717
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.34.34.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.020131763070821762,
+      5.523290383280255e-05,
+      0.9797847270965576,
+      2.8281214326852933e-05
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.39.55.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.0007648516912013292,
+      0.10553388297557831,
+      0.8936899304389954,
+      1.129928477894282e-05
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.40.40.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.0018932634266093373,
+      0.023570962250232697,
+      0.9733309745788574,
+      0.001204818719998002
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.54.02.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.004523326642811298,
+      0.031780313700437546,
+      0.9561529159545898,
+      0.007543492130935192
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 01.00.32.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.22831103205680847,
+      0.012585880234837532,
+      0.630953848361969,
+      0.12814924120903015
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 01.05.31.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.18950088322162628,
+      0.002218059729784727,
+      0.7949953675270081,
+      0.013285687193274498
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 19.38.16.mp4",
+    "label": "osoto_gari",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.46368643641471863,
+      0.1529720425605774,
+      0.2240353524684906,
+      0.15930618345737457
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/Screen Recording 2025-03-15 at 11.30.00.mp4",
+    "label": "osoto_gari",
+    "prediction": "o_goshi",
+    "scores": [
+      0.031623922288417816,
+      0.7944321036338806,
+      0.16511192917823792,
+      0.008832032792270184
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/ScreenRecording2025-01-17at18.52.24-ezgif.com-crop-video.mp4",
+    "label": "osoto_gari",
+    "prediction": "osoto_gari",
+    "scores": [
+      0.021190114319324493,
+      0.03341250121593475,
+      0.8231401443481445,
+      0.12225726991891861
+    ]
+  },
+  {
+    "path": "data/raw/train/osoto_gari/ScreenRecording2025-01-17at19.25.19-ezgif.com-crop-video.mp4",
+    "label": "osoto_gari",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.00022685537987854332,
+      0.03521670028567314,
+      0.04147752746939659,
+      0.9230788946151733
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 13.09.48.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.22013802826404572,
+      0.09716048836708069,
+      0.0031720136757940054,
+      0.6795294880867004
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 13.22.57.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.08935140818357468,
+      0.0010799295268952847,
+      0.0110941706225276,
+      0.8984745144844055
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 13.38.30.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.009736691601574421,
+      0.01791922003030777,
+      0.00019870455435011536,
+      0.9721453189849854
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.00.58.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0024838969111442566,
+      0.045296479016542435,
+      4.910832649329677e-05,
+      0.9521704912185669
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.02.46.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.00368749862536788,
+      0.002150129759684205,
+      0.009244696237146854,
+      0.9849177002906799
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.08.16.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0001880653144326061,
+      0.0007094127358868718,
+      2.5436125724809244e-05,
+      0.9990770816802979
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.17.28.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.11095301806926727,
+      0.039269812405109406,
+      0.011285410262644291,
+      0.8384917974472046
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.18.59.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.03061632812023163,
+      0.06171045079827309,
+      0.05451533943414688,
+      0.8531578779220581
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.19.49.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.26195546984672546,
+      0.031103916466236115,
+      0.011160150170326233,
+      0.6957804560661316
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.22.00.mp4",
+    "label": "uchi_mata",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.48729953169822693,
+      0.019319310784339905,
+      0.09876978397369385,
+      0.3946114182472229
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.27.19.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0009542658808641136,
+      0.00909414328634739,
+      0.003162889275699854,
+      0.9867886900901794
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.28.43.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.40299150347709656,
+      0.03100750781595707,
+      0.013607056811451912,
+      0.552393913269043
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.32.40.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.08476752787828445,
+      0.0008580205612815917,
+      0.18034833669662476,
+      0.7340260744094849
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.33.39.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0036991992965340614,
+      0.0015224014641717076,
+      0.432079017162323,
+      0.5626994371414185
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.40.47.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0041160667315125465,
+      0.36028939485549927,
+      0.05364752188324928,
+      0.5819470286369324
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 14.57.21.mp4",
+    "label": "uchi_mata",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.984599232673645,
+      0.007605236954987049,
+      0.007089762948453426,
+      0.0007058230694383383
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.01.26.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.10325189679861069,
+      0.0016478038160130382,
+      0.0021795707289129496,
+      0.892920732498169
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.03.07.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.035951852798461914,
+      0.007100129034370184,
+      0.04403875395655632,
+      0.9129092693328857
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.04.33.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.2180018573999405,
+      0.010720028541982174,
+      0.0369725339114666,
+      0.7343056201934814
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.38.16.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.020051026716828346,
+      0.0032732347026467323,
+      0.005420119501650333,
+      0.9712556600570679
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.39.05.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0001520596124464646,
+      0.0003747137379832566,
+      0.3443242907524109,
+      0.6551489233970642
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 15.51.20.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.04603360593318939,
+      0.008750395849347115,
+      0.023976534605026245,
+      0.9212394952774048
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-15 at 18.26.16.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0046411799266934395,
+      0.008187065832316875,
+      0.021021835505962372,
+      0.9661498665809631
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-16 at 00.12.22.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      3.7432955650729127e-06,
+      6.5080398599093314e-06,
+      0.0016836809227243066,
+      0.9983060359954834
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-16 at 00.23.57.mp4",
+    "label": "uchi_mata",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.6766101717948914,
+      0.009135330095887184,
+      0.032552510499954224,
+      0.2817019522190094
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/Screen Recording 2025-03-16 at 00.27.20.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.020152125507593155,
+      4.3237771023996174e-05,
+      0.1224292740225792,
+      0.8573753237724304
+    ]
+  },
+  {
+    "path": "data/raw/train/uchi_mata/cropped_Screen Recording 2025-03-15 at 18.17.07.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.2892391085624695,
+      9.836697427090257e-05,
+      0.005475579295307398,
+      0.7051869034767151
+    ]
+  },
+  {
+    "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.44.31.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.8262747526168823,
+      0.014907793141901493,
+      0.08966512233018875,
+      0.0691523477435112
+    ]
+  },
+  {
+    "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-03-16 at 14.22.42.mp4",
+    "label": "ippon_seoi_nage",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.8858348727226257,
+      0.0010866000084206462,
+      0.053195346146821976,
+      0.059883132576942444
+    ]
+  },
+  {
+    "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 13.28.55.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.04600553959608078,
+      0.7483603358268738,
+      0.006392249371856451,
+      0.19924181699752808
+    ]
+  },
+  {
+    "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.29.12.mp4",
+    "label": "o_goshi",
+    "prediction": "ippon_seoi_nage",
+    "scores": [
+      0.6217761635780334,
+      0.08774658292531967,
+      0.11453432589769363,
+      0.17594292759895325
+    ]
+  },
+  {
+    "path": "data/raw/val/o_goshi/Screen Recording 2025-03-16 at 12.11.47.mp4",
+    "label": "o_goshi",
+    "prediction": "o_goshi",
+    "scores": [
+      0.0014210708905011415,
+      0.915241539478302,
+      0.001005435362458229,
+      0.08233193308115005
+    ]
+  },
+  {
+    "path": "data/raw/val/uchi_mata/Screen Recording 2025-03-15 at 13.59.33.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.0030703211668878794,
+      0.11424144357442856,
+      0.042309824377298355,
+      0.8403783440589905
+    ]
+  },
+  {
+    "path": "data/raw/val/uchi_mata/Screen Recording 2025-03-15 at 14.23.53.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.2093048244714737,
+      0.0048156315460801125,
+      0.03568146005272865,
+      0.7501980662345886
+    ]
+  },
+  {
+    "path": "data/raw/val/uchi_mata/Screen Recording 2025-03-15 at 14.59.49.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.09604965150356293,
+      0.04096978157758713,
+      0.030059166252613068,
+      0.8329213857650757
+    ]
+  },
+  {
+    "path": "data/raw/val/uchi_mata/Screen Recording 2025-03-15 at 15.05.42.mp4",
+    "label": "uchi_mata",
+    "prediction": "uchi_mata",
+    "scores": [
+      0.077208012342453,
+      0.06478296220302582,
+      0.02860398218035698,
+      0.8294050097465515
+    ]
+  }
+]

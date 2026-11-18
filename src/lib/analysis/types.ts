@@ -9,6 +9,9 @@ export type JudoAnalysisEvent = {
   startMs: number;
   endMs: number;
   techniqueId: string | null;
+  eventId?: string;
+  techniqueCandidates?: { techniqueId: string; nameKo: string; modelScore: number }[];
+  serviceScore?: "unreviewed";
   score: JudoScore;
   toriRole: "blue" | "white" | "unknown";
   ukeRole: "blue" | "white" | "unknown";

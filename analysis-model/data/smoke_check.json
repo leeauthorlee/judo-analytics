@@ -1,0 +1,26 @@
+{
+  "hash_overlap": false,
+  "examples": [
+    {
+      "label": "ippon_seoi_nage",
+      "predicted": "o_goshi",
+      "seconds": 3.197843074798584
+    },
+    {
+      "label": "o_goshi",
+      "predicted": "osoto_gari",
+      "seconds": 0.8698463439941406
+    },
+    {
+      "label": "osoto_gari",
+      "predicted": "osoto_gari",
+      "seconds": 1.0379807949066162
+    },
+    {
+      "label": "uchi_mata",
+      "predicted": "uchi_mata",
+      "seconds": 1.1095912456512451
+    }
+  ],
+  "scope": "smoke_test_only_not_additional_accuracy_estimate"
+}

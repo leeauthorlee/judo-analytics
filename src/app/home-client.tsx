@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
+import AnalysisReviewForm, { type AnalysisReview } from "@/app/components/analysis-review";
+import type { JudoAnalysisEvent } from "@/lib/analysis/types";
 
 type Video = {
   id: string;
@@ -12,16 +14,7 @@ type Video = {
   created_at: string;
 };
 
-type AnalysisEvent = {
-  eventId?: string;
-  startMs: number;
-  endMs: number;
-  techniqueId: string | null;
-  score: "ippon" | "waza_ari" | "yuko" | "no_score" | "uncertain";
-  confidenceBand: "low" | "medium" | "high";
-  observations?: string[];
-  missingEvidence?: string[];
-};
+type AnalysisEvent = JudoAnalysisEvent;
 
 type Analysis = {
   id: string;
@@ -29,7 +22,8 @@ type Analysis = {
   status: "queued" | "processing" | "review_required" | "completed" | "failed";
   error_code: string | null;
   created_at: string;
-  result_json: { events?: AnalysisEvent[] } | null;
+  result_json: { events?: AnalysisEvent[]; provider?: string; providerVersion?: string; disclaimer?: string } | null;
+  analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
 };
 
 type Highlight = {
@@ -104,7 +98,9 @@ export default function HomeClient({
   const [diaryTitle, setDiaryTitle] = useState("");
   const [diaryNote, setDiaryNote] = useState("");
   const [selectedHighlightIds, setSelectedHighlightIds] = useState<string[]>([]);
-  const [temporaryResult, setTemporaryResult] = useState<Analysis["result_json"]>(null);
+  const [duration, setDuration] = useState(0);
+  const [startSeconds, setStartSeconds] = useState(0);
+  const [endSeconds, setEndSeconds] = useState(0);
 
   useEffect(() => () => {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -121,6 +117,7 @@ export default function HomeClient({
     previewUrlRef.current = file ? URL.createObjectURL(file) : null;
     setPreviewUrl(previewUrlRef.current);
     setVideo(file);
+    setDuration(0); setStartSeconds(0); setEndSeconds(0);
   }
 
   function selectVideo(file?: File) {
@@ -180,6 +177,10 @@ export default function HomeClient({
 
   async function uploadAndQueue() {
     if (!video) return;
+    if (!duration || duration > 600 || !Number.isFinite(startSeconds) || !Number.isFinite(endSeconds) ||
+        startSeconds < 0 || endSeconds <= startSeconds || endSeconds > duration || endSeconds - startSeconds > 30) {
+      setError("10분 이하 영상에서 분석할 공격 구간을 30초 이내로 지정해 주세요."); return;
+    }
     setBusy(true);
     setError("");
     setMessage("");
@@ -218,21 +219,17 @@ export default function HomeClient({
       const analysisResponse = await fetch("/api/analyses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId: videoBody.video.id, thumbnailKey }),
+        body: JSON.stringify({ videoId: videoBody.video.id, thumbnailKey, startMs: Math.round(startSeconds * 1000), endMs: Math.round(endSeconds * 1000) }),
       });
       const analysisBody = await analysisResponse.json();
       if (!analysisResponse.ok) throw new Error(analysisBody.error ?? "분석 작업을 등록하지 못했습니다.");
 
-      setTemporaryResult(analysisBody.result ?? null);
-      setMessage(
-        analysisBody.autoSavedDiaryId
-          ? "판단 불가 결과와 점수, 썸네일이 일기에 자동 저장되었습니다."
-          : "영상 저장 및 분석 요청이 완료되었습니다.",
-      );
+      setMessage("기술 추천을 요청했습니다. 완료 후 실제 결과가 일기에 저장됩니다.");
       setSelectedVideo(null);
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "업로드 또는 작업 등록에 실패했습니다.");
+      router.refresh();
     } finally {
       setBusy(false);
     }
@@ -319,10 +316,10 @@ export default function HomeClient({
       <section className="hero" id="top">
         <div className="hero-copy">
           <p className="eyebrow">JUDO VIDEO REVIEW</p>
-          <h1>기술을 다시 보고,<br />판정의 근거를 확인하다.</h1>
+          <h1>기술을 다시 보고,<br />착지를 직접 확인하다.</h1>
           <p className="hero-description">
-            경기 영상에서 기술 장면을 검토하기 위한 분석 도구입니다.<br />
-            결과는 공식 심판 판정이 아닌 AI 추정으로 제공됩니다.
+            선택한 공격 구간에서 AI가 기술 후보를 추천합니다.<br />
+            착지와 득점은 영상을 보고 직접 확인합니다.
           </p>
           <a className="primary-button" href="#analysis">영상 선택하기</a>
         </div>
@@ -332,25 +329,11 @@ export default function HomeClient({
       {error && <p className="feedback error" role="alert">{error}</p>}
       {message && <p className="feedback notice" role="status">{message}</p>}
 
-      {temporaryResult?.events?.map((event, index) => (
-        <section className="section temporary-result" key={index}>
-          <div className="section-heading">
-            <p className="eyebrow">ANALYSIS RESULT</p>
-            <h2>판정 결과</h2>
-          </div>
-          <div className="result-card">
-            <strong>판단 불가</strong>
-            <span>점수: {scoreLabel(event.score)} · 신뢰도 {event.confidenceBand}</span>
-            <p>{event.observations?.[0] ?? "판단할 수 없습니다."}</p>
-          </div>
-        </section>
-      ))}
-
       <section className="section" id="analysis">
         <div className="section-heading">
           <p className="eyebrow">VIDEO ANALYSIS</p>
           <h2>영상 분석</h2>
-          <p>MP4 · 최대 500 MB · 10분 이하</p>
+          <p>MP4 · 최대 500 MB · 10분 이하 · 한 번의 공격 구간을 30초 이내로 선택</p>
         </div>
 
         <div
@@ -372,7 +355,14 @@ export default function HomeClient({
               <strong>{video.name}</strong>
               <span>{formatSize(video.size)}</span>
             </div>
-            {previewUrl && <video className="preview" src={previewUrl} controls preload="metadata" />}
+            {previewUrl && <video className="preview" src={previewUrl} controls preload="metadata"
+              onLoadedMetadata={(e) => { const seconds = e.currentTarget.duration;
+                if (Number.isFinite(seconds)) { setDuration(seconds); setEndSeconds(Math.floor(Math.min(seconds, 30) * 1000) / 1000); }
+              }} onError={() => setError("영상 메타데이터를 읽을 수 없습니다.")} />}
+            <div className="interval-inputs">
+              <label>시작 (초)<input type="number" min="0" step="0.001" value={startSeconds} onChange={(e) => setStartSeconds(Number(e.target.value))} /></label>
+              <label>종료 (초)<input type="number" min="0" max={duration || undefined} step="0.001" value={endSeconds} onChange={(e) => setEndSeconds(Number(e.target.value))} /></label>
+            </div>
             <button className="primary-button" disabled={busy} onClick={() => void uploadAndQueue()}>
               {busy ? "업로드 중…" : "분석 요청"}
             </button>
@@ -393,11 +383,24 @@ export default function HomeClient({
                       <strong>{item.original_name}</strong>
                       <span>{formatSize(item.size_bytes)} · {new Date(item.created_at).toLocaleString("ko-KR")}</span>
                     </div>
-                    <span className="status">{analysis ? statusLabel(analysis.status) : "업로드 완료"}</span>
+                    <span className="status">{analysis
+                      ? (Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews.length > 0 : Boolean(analysis.analysis_reviews))
+                        ? "사용자 확인 완료" : statusLabel(analysis.status)
+                      : "업로드 완료"}</span>
+                    {analysis?.status === "failed" && <p role="alert">{analysis.error_code === "INVALID_ANALYSIS_INTERVAL"
+                      ? "분석 구간이 올바르지 않습니다. 30초 이내 구간을 선택해 주세요."
+                      : analysis.error_code === "MODEL_NOT_CONFIGURED" ? "워커에 모델 파일을 설치해야 합니다."
+                        : "분석에 실패했습니다. 워커 연결과 영상 파일을 확인해 주세요."}</p>}
                     <button className="text-button row-delete" type="button" onClick={() => void deleteVideo(item)}>삭제</button>
                     {analysis?.result_json?.events?.map((event, index) => (
                       <div className="analysis-event" key={event.eventId ?? `${item.id}-${index}`}>
-                        <span>{formatTime(event.startMs)}–{formatTime(event.endMs)} · {event.techniqueId ?? "기술 판별 불가"} · {scoreLabel(event.score)} · 신뢰도 {event.confidenceBand}</span>
+                        <div>
+                          <p>{formatTime(event.startMs)}–{formatTime(event.endMs)} · {event.serviceScore === "unreviewed" ? "AI 기술 추천 / 착지 사용자 확인" : scoreLabel(event.score)}</p>
+                          {event.techniqueCandidates && <AnalysisReviewForm analysisId={analysis.id} videoId={item.id} event={event}
+                            review={Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews[0] : analysis.analysis_reviews ?? undefined} />}
+                          {analysis.result_json?.disclaimer && <p>{analysis.result_json.disclaimer}</p>}
+                          {analysis.result_json?.providerVersion && <small>모델: {analysis.result_json.providerVersion}</small>}
+                        </div>
                         {event.eventId && !highlights.some((highlight) => highlight.event_id === event.eventId) && (
                           <button
                             className="secondary-button event-button"
@@ -415,7 +418,7 @@ export default function HomeClient({
               })}
             </div>
           )}
-          <p className="disclaimer">분석 모델은 아직 연결되지 않았습니다. 점수 후보는 공식 판정이 아닙니다.</p>
+          <p className="disclaimer">한팔업어치기·허리껴치기·밭다리후리기·허벅다리걸기 후보를 추천합니다. 착지와 득점은 사용자가 확인하며 공식 판정이 아닙니다.</p>
         </div>
       </section>
 

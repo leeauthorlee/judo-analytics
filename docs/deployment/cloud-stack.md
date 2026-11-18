@@ -1,10 +1,10 @@
 # Next.js, Supabase, Vercel, and Google Cloud setup
 
-The application uses Vercel for the Next.js control plane, Supabase Auth/Postgres for accounts and persistent state, Vercel Blob private storage for uploaded MP4 files, Google Cloud Tasks for durable dispatch, and a private Cloud Run service for video work. The model adapter in `worker/analysis-provider.js` is intentionally empty; until it is implemented, jobs finish as `MODEL_NOT_CONFIGURED` rather than returning invented results.
+The application uses Vercel for the Next.js control plane, Supabase Auth/Postgres, private Vercel Blob, Cloud Tasks and private Cloud Run. `worker/analysis-provider.js` now invokes the trained Python R3D-18 model for a user-selected interval of at most 30 seconds. It returns technique candidates only; landing and service scores require user confirmation. See [model integration](../architecture/model-integration.md).
 
 ## 1. Supabase project
 
-1. Create a Supabase project and run `supabase/migrations/202611180001_initial_schema.sql` from the SQL Editor, or link the project with the Supabase CLI and run `supabase db push`.
+1. Run both migrations in order: `202611180001_initial_schema.sql`, then `202611180002_model_integration.sql`. Existing projects only need the second migration. It adds selection inputs, manual reviews, the model registry entry and transactional result persistence.
 2. Copy the project URL and the **publishable** key from the project Connect/API settings. Add them to Vercel and local `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 3. In Authentication → URL Configuration, allow the local URL `http://localhost:3000/auth/callback` and the production URL `https://<your-domain>/auth/callback`.
 4. Enable Google and Kakao under Authentication → Sign In / Providers. Put the OAuth client credentials in Supabase, not in this repository. In each identity provider's console, register Supabase's callback URL (`https://<project-ref>.supabase.co/auth/v1/callback`).
@@ -38,7 +38,7 @@ Do not commit `.env.local`, service account JSON, OAuth secrets, Blob tokens, or
 
 Create a queue and service accounts in the same project/region. Grant the Vercel dispatcher identity permission to create Cloud Tasks. Grant the task OIDC service account `roles/run.invoker` on the Cloud Run worker and `roles/iam.serviceAccountUser` where required to mint the OIDC token. Keep the worker service unauthenticated access disabled.
 
-Build and deploy the `worker/` directory as a Cloud Run service. Supply these secrets through Secret Manager / Cloud Run secret references:
+Build from the repository root with `docker build -f worker/Dockerfile -t judo-analysis-worker .`. Place the trained artifact at `analysis-model/models/judo_r3d18.pt` first (it is not in Git). The image includes Python, CPU inference dependencies and FFmpeg. Deploy privately to Cloud Run with concurrency 1 initially. Supply these secrets through Secret Manager / Cloud Run secret references:
 
 | Worker variable | Source |
 |---|---|
@@ -46,7 +46,7 @@ Build and deploy the `worker/` directory as a Cloud Run service. Supply these se
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase server-only service-role key |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token that can read the private video store |
 
-Cloud Tasks sends `POST <worker-url>/tasks` with an OIDC token and `{ "analysis_id": "..." }`. The worker reads the analysis/video records, fetches the private Blob object, invokes `analyzeVideo`, and persists results. The included adapter deliberately reports `MODEL_NOT_CONFIGURED` until replaced. Configure queue retry/dispatch deadlines and Cloud Run memory/timeout based on the eventual video/model workload; do not run inference in a Vercel request.
+Cloud Tasks sends `POST <worker-url>/tasks` with an OIDC token and `{ "analysis_id": "..." }`. The worker loads `input_json.startMs/endMs`, validates media and calls the Python checkpoint. A DB transaction stores events, real-result highlights/diaries and `review_required` status. Missing weights yield `MODEL_NOT_CONFIGURED`. Use a 600-second request/dispatch deadline initially and configure retry limits; inference does not run inside Vercel.
 
 ## 4. OAuth provider setup checklist
 
@@ -60,7 +60,7 @@ Cloud Tasks sends `POST <worker-url>/tasks` with an OIDC token and `{ "analysis_
 1. Run `npm run typecheck`, `npm run lint`, and `npm run build`.
 2. Sign in through each enabled provider and confirm the `profiles` and `workspaces` rows are created.
 3. Upload an authorized test MP4 below 500 MB. Confirm the Blob is private, a `video_assets` row appears, and a `video_analyses` row is queued.
-4. Confirm Cloud Tasks invokes the private Cloud Run service and the current empty adapter changes the job to `failed / MODEL_NOT_CONFIGURED`.
+4. Select one attack interval of at most 30 seconds. Confirm Cloud Tasks invokes the private worker, the job becomes `review_required`, and three technique candidates appear. Save a manual landing review and confirm model JSON is unchanged and the diary shows the user-confirmed score.
 5. Sign in as another user and verify the first user's rows are invisible under RLS.
 
-The upload UI checks the MP4 extension/MIME and 500 MB size; the Cloud Run worker validates the actual MP4 container and enforces the 10-minute duration before calling a model. The app does not yet create thumbnails, offer manual timeline-based highlight editing, or define account/session retention and expiry jobs. These remain follow-up production requirements.
+The upload UI checks file type/size and offers numeric attack interval selection. The worker validates MP4 and the 10-minute source limit, then enforces the 30-second analysis interval. Thumbnail creation and analysis highlights are implemented. Account/session retention, guest access and production quotas remain follow-up requirements. No automatic landing or official scoring model is connected.

@@ -96,7 +96,7 @@ async function getAnalyses(supabase: Awaited<ReturnType<typeof createClient>>, v
   if (!videoIds.length) return [];
   const { data } = await supabase
     .from("video_analyses")
-    .select("id,video_id,status,error_code,result_json,created_at")
+    .select("id,video_id,status,error_code,result_json,created_at,analysis_reviews(technique_label,landing_choice,service_score)")
     .in("video_id", videoIds)
     .order("created_at", { ascending: false });
   return data ?? [];

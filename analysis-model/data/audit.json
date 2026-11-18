@@ -1,0 +1,591 @@
+{
+  "downloaded": 801,
+  "unique_decodable": 676,
+  "duplicates": [
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 22.55.10.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 22.55.10.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.14.31.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.14.31.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.40.06.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.40.06.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.16.03.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.16.03.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.05.34.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.05.34.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.06.01.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.06.01.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.12.54.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.12.54.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.32.04.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.32.04.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.42.48.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.42.48.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 12.53.12.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 12.53.12.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 12.55.48.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 12.55.48.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.09.06.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.09.06.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.15.11.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.15.11.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.07.03.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.07.03.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.14.31.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.14.31.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.22.18.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.22.18.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.54.09.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.54.09.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/o_goshi/ScreenRecording2025-02-01at13.28.24-ezgif.com-video-speed.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/ScreenRecording2025-02-01at13.28.24-ezgif.com-video-speed.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.15.41.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.15.41.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.22.14.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.22.14.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.44.44.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.44.44.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.45.28.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.45.28.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.46.47.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.46.47.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 00.59.27.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.59.27.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 01.11.10.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 01.11.10.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 01.13.34.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 01.13.34.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-19 at 13.25.46.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/Screen Recording 2025-01-19 at 13.25.46.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/ScreenRecording2025-01-19at13.32.00-ezgif.com-video-speed.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/ScreenRecording2025-01-19at13.32.00-ezgif.com-video-speed.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.07.58.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.07.58.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.29.09.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.29.09.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.38.33.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.38.33.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.39.42.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.39.42.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.40.37.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.40.37.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.42.18.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.42.18.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.44.47.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.44.47.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.19.15.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.19.15.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.22.54.mp4",
+      "duplicate_of": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.22.54.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.33.23.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.33.23.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.33.55.mp4",
+      "duplicate_of": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.33.55.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 13.04.35.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.04.35.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 13.09.44.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.09.44.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 13.17.03.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.17.03.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.03.53.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.03.53.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.26.16.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.26.16.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.32.22.mp4",
+      "duplicate_of": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.32.22.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.43.52.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.43.52.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 14.47.27.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.47.27.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 15.10.37.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 15.10.37.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/Screen Recording 2025-02-01 at 15.16.11.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 15.16.11.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/o_goshi/ScreenRecording2025-02-01at13.24.40-ezgif.com-video-speed.mp4",
+      "duplicate_of": "data/raw/train/o_goshi/ScreenRecording2025-02-01at13.24.40-ezgif.com-video-speed.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 18.23.48.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.23.48.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 18.30.40.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.30.40.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 18.48.40.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.48.40.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 18.51.49.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.51.49.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 18.59.59.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.59.59.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 19.01.59.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.01.59.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 19.08.19.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.08.19.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 19.09.18.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.09.18.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-17 at 20.01.41.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 20.01.41.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-18 at 01.14.18.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 01.14.18.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-18 at 19.39.38.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 19.39.38.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/Screen Recording 2025-01-19 at 13.27.17.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/Screen Recording 2025-01-19 at 13.27.17.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/ScreenRecording2025-01-17at18.57.48-ezgif.com-crop-video.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/ScreenRecording2025-01-17at18.57.48-ezgif.com-crop-video.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/ScreenRecording2025-01-17at19.18.04-ezgif.com-crop-video.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/ScreenRecording2025-01-17at19.18.04-ezgif.com-crop-video.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/ScreenRecording2025-01-17at19.37.15-ezgif.com-crop-video.mp4",
+      "duplicate_of": "data/raw/train/osoto_gari/ScreenRecording2025-01-17at19.37.15-ezgif.com-crop-video.mp4",
+      "reason": "sha256_or_name"
+    },
+    {
+      "path": "data/raw/val/osoto_gari/ScreenRecording2025-01-19at13.28.17-ezgif.com-video-speed.mp4",
+      "duplicate_of": "data/raw/test/osoto_gari/ScreenRecording2025-01-19at13.28.17-ezgif.com-video-speed.mp4",
+      "reason": "sha256_or_name"
+    }
+  ],
+  "rejected": [
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.22.36.mp4",
+      "reason": "Cannot decode frame 164: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.22.36.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.28.36.mp4",
+      "reason": "Cannot decode frame 151: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.28.36.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.41.25.mp4",
+      "reason": "Cannot decode frame 106: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.41.25.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.10.16.mp4",
+      "reason": "Cannot decode frame 85: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.10.16.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.12.16.mp4",
+      "reason": "Cannot decode frame 182: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.12.16.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.25.14.mp4",
+      "reason": "Cannot decode frame 130: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.25.14.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.37.38.mp4",
+      "reason": "Cannot decode frame 118: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.37.38.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.41.18.mp4",
+      "reason": "Cannot decode frame 99: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.41.18.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.44.31.mp4",
+      "reason": "Cannot decode frame 93: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.44.31.mp4"
+    },
+    {
+      "path": "data/raw/test/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.46.20.mp4",
+      "reason": "Cannot decode frame 79: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.46.20.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.26.59.mp4",
+      "reason": "Cannot decode frame 148: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 13.26.59.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 13.34.19.mp4",
+      "reason": "Cannot decode frame 102: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 13.34.19.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.01.14.mp4",
+      "reason": "Cannot decode frame 105: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.01.14.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.06.14.mp4",
+      "reason": "Cannot decode frame 97: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.06.14.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.06.41.mp4",
+      "reason": "Cannot decode frame 126: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.06.41.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.27.06.mp4",
+      "reason": "Cannot decode frame 105: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.27.06.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.47.55.mp4",
+      "reason": "Cannot decode frame 126: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.47.55.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.52.51.mp4",
+      "reason": "Cannot decode frame 152: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.52.51.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 14.58.54.mp4",
+      "reason": "Cannot decode frame 82: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 14.58.54.mp4"
+    },
+    {
+      "path": "data/raw/test/o_goshi/Screen Recording 2025-02-01 at 15.14.06.mp4",
+      "reason": "Cannot decode frame 115: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\o_goshi\\Screen Recording 2025-02-01 at 15.14.06.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.21.27.mp4",
+      "reason": "Cannot decode frame 171: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 18.21.27.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.25.45.mp4",
+      "reason": "Cannot decode frame 136: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 18.25.45.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.32.30.mp4",
+      "reason": "Cannot decode frame 71: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 18.32.30.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.38.00.mp4",
+      "reason": "Cannot decode frame 169: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 18.38.00.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 18.53.35.mp4",
+      "reason": "Cannot decode frame 170: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 18.53.35.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 19.14.46.mp4",
+      "reason": "Cannot decode frame 116: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 19.14.46.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-17 at 19.40.22.mp4",
+      "reason": "Cannot decode frame 86: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-17 at 19.40.22.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.28.35.mp4",
+      "reason": "Cannot decode frame 87: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 00.28.35.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.30.54.mp4",
+      "reason": "Cannot decode frame 215: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 00.30.54.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.36.13.mp4",
+      "reason": "Cannot decode frame 126: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 00.36.13.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 00.43.02.mp4",
+      "reason": "Cannot decode frame 233: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 00.43.02.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 01.01.46.mp4",
+      "reason": "Cannot decode frame 114: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 01.01.46.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 17.21.04.mp4",
+      "reason": "Cannot decode frame 169: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 17.21.04.mp4"
+    },
+    {
+      "path": "data/raw/test/osoto_gari/Screen Recording 2025-01-18 at 19.52.01.mp4",
+      "reason": "Cannot decode frame 83: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\test\\osoto_gari\\Screen Recording 2025-01-18 at 19.52.01.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.09.22.mp4",
+      "reason": "Cannot decode frame 89: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.09.22.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.21.28.mp4",
+      "reason": "Cannot decode frame 164: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.21.28.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.26.13.mp4",
+      "reason": "Cannot decode frame 221: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.26.13.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-18 at 23.34.00.mp4",
+      "reason": "Cannot decode frame 110: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-18 at 23.34.00.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 13.12.53.mp4",
+      "reason": "Cannot decode frame 122: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 13.12.53.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.06.23.mp4",
+      "reason": "Cannot decode frame 131: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.06.23.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.15.08.mp4",
+      "reason": "Cannot decode frame 140: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.15.08.mp4"
+    },
+    {
+      "path": "data/raw/train/ippon_seoi_nage/Screen Recording 2025-01-19 at 22.48.28.mp4",
+      "reason": "Cannot decode frame 97: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\ippon_seoi_nage\\Screen Recording 2025-01-19 at 22.48.28.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.05.59.mp4",
+      "reason": "Cannot decode frame 284: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 13.05.59.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.14.11.mp4",
+      "reason": "Cannot decode frame 142: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 13.14.11.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 13.28.55.mp4",
+      "reason": "Cannot decode frame 121: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 13.28.55.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.00.24.mp4",
+      "reason": "Cannot decode frame 129: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 14.00.24.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.10.37.mp4",
+      "reason": "Cannot decode frame 65: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 14.10.37.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.26.43.mp4",
+      "reason": "Cannot decode frame 88: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 14.26.43.mp4"
+    },
+    {
+      "path": "data/raw/train/o_goshi/Screen Recording 2025-02-01 at 14.29.12.mp4",
+      "reason": "Cannot decode frame 79: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\o_goshi\\Screen Recording 2025-02-01 at 14.29.12.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.13.24.mp4",
+      "reason": "Cannot decode frame 133: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 18.13.24.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.19.46.mp4",
+      "reason": "Cannot decode frame 155: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 18.19.46.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.20.33.mp4",
+      "reason": "Cannot decode frame 205: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 18.20.33.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 18.43.31.mp4",
+      "reason": "Cannot decode frame 106: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 18.43.31.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.29.43.mp4",
+      "reason": "Cannot decode frame 117: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 19.29.43.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.43.04.mp4",
+      "reason": "Cannot decode frame 99: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 19.43.04.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-17 at 19.43.57.mp4",
+      "reason": "Cannot decode frame 131: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-17 at 19.43.57.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 19.42.30.mp4",
+      "reason": "Cannot decode frame 141: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-18 at 19.42.30.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-18 at 19.50.29.mp4",
+      "reason": "Cannot decode frame 183: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-18 at 19.50.29.mp4"
+    },
+    {
+      "path": "data/raw/train/osoto_gari/Screen Recording 2025-01-19 at 13.26.17.mp4",
+      "reason": "Cannot decode frame 119: C:\\Users\\이지은\\Desktop\\취업\\대외활동\\청년도약_부트캠프\\서비스전문가과정\\중급\\Day6\\judo-analytics\\analysis-model\\data\\raw\\train\\osoto_gari\\Screen Recording 2025-01-19 at 13.26.17.mp4"
+    }
+  ],
+  "class_counts": {
+    "ippon_seoi_nage": 154,
+    "o_goshi": 141,
+    "osoto_gari": 162,
+    "uchi_mata": 219
+  },
+  "split_counts": {
+    "val": 101,
+    "train": 474,
+    "test": 101
+  },
+  "evaluation_scope": "exploratory_clip_split_not_independent_matches",
+  "limitations": [
+    "Original match/athlete IDs unavailable; related clips may cross splits.",
+    "Labels are publisher labels, not expert-verified.",
+    "Original video rights and provenance are not documented by publisher."
+  ]
+}

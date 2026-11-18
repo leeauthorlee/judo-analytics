@@ -1,0 +1,12 @@
+**
+!worker/
+!worker/package.json
+!worker/package-lock.json
+!worker/*.js
+!worker/Dockerfile
+!analysis-model/
+!analysis-model/requirements-inference.txt
+!analysis-model/judo_model.py
+!analysis-model/predict.py
+!analysis-model/models/
+!analysis-model/models/judo_r3d18.pt

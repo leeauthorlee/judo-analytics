@@ -1,0 +1,110 @@
+{
+  "model": "frozen_r3d18_kinetics400_linear_v1",
+  "classes": [
+    "ippon_seoi_nage",
+    "o_goshi",
+    "osoto_gari",
+    "uchi_mata"
+  ],
+  "selection": [
+    {
+      "C": 0.001,
+      "validation_macro_f1": 0.6193168250779748
+    },
+    {
+      "C": 0.01,
+      "validation_macro_f1": 0.713639940622038
+    },
+    {
+      "C": 0.1,
+      "validation_macro_f1": 0.717868973132131
+    },
+    {
+      "C": 1.0,
+      "validation_macro_f1": 0.7085949585949587
+    }
+  ],
+  "selected_C": 0.1,
+  "test_count": 101,
+  "top1_accuracy": 0.6732673267326733,
+  "top3_accuracy": 0.9207920792079208,
+  "macro_f1": 0.6496436069914546,
+  "majority_baseline_accuracy": 0.32673267326732675,
+  "majority_baseline_macro_f1": 0.12313432835820895,
+  "frequent_three_baseline_top3": 0.7920792079207921,
+  "confusion_matrix": [
+    [
+      11,
+      2,
+      5,
+      5
+    ],
+    [
+      2,
+      12,
+      3,
+      4
+    ],
+    [
+      4,
+      2,
+      15,
+      3
+    ],
+    [
+      3,
+      0,
+      0,
+      30
+    ]
+  ],
+  "per_class": {
+    "ippon_seoi_nage": {
+      "precision": 0.55,
+      "recall": 0.4782608695652174,
+      "f1-score": 0.5116279069767442,
+      "support": 23.0
+    },
+    "o_goshi": {
+      "precision": 0.75,
+      "recall": 0.5714285714285714,
+      "f1-score": 0.6486486486486487,
+      "support": 21.0
+    },
+    "osoto_gari": {
+      "precision": 0.6521739130434783,
+      "recall": 0.625,
+      "f1-score": 0.6382978723404256,
+      "support": 24.0
+    },
+    "uchi_mata": {
+      "precision": 0.7142857142857143,
+      "recall": 0.9090909090909091,
+      "f1-score": 0.8,
+      "support": 33.0
+    },
+    "accuracy": 0.6732673267326733,
+    "macro avg": {
+      "precision": 0.6666149068322982,
+      "recall": 0.6459450875211745,
+      "f1-score": 0.6496436069914546,
+      "support": 101.0
+    },
+    "weighted avg": {
+      "precision": 0.6695406186581391,
+      "recall": 0.6732673267326733,
+      "f1-score": 0.6644377467154154,
+      "support": 101.0
+    }
+  },
+  "elapsed_seconds": 10.782477140426636,
+  "feature_cache_hits": 676,
+  "new_feature_extractions": 0,
+  "device": "cpu",
+  "threads": 4,
+  "frames_per_clip": 16,
+  "status": "experimental_requires_user_review",
+  "evaluation_scope": "deduplicated_clip_split_not_independent_matches",
+  "limitations": "Unknown original matches/athletes and unverified labels; not a deployment accuracy claim.",
+  "manifest_sha256": "f0b657c96f444fa4d6518c19ebe39aeb51a5c103f5cf216860019b123ac06d88"
+}
