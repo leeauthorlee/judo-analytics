@@ -33,8 +33,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "영상 정보가 올바르지 않습니다." }, { status: 400 });
   }
 
+  let blob;
   try {
-    const blob = await head(pathname, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    blob = await head(pathname, { token: process.env.BLOB_READ_WRITE_TOKEN });
+  } catch (cause) {
+    console.error("BLOB_HEAD_FAILED", pathname, cause);
+    return NextResponse.json({ error: "업로드된 영상을 찾을 수 없습니다." }, { status: 404 });
+  }
+
+  try {
     if (blob.contentType !== "video/mp4" || blob.size <= 0 || blob.size > MAX_VIDEO_BYTES) {
       return NextResponse.json({ error: "MP4 형식 또는 파일 크기를 확인해 주세요." }, { status: 400 });
     }
@@ -68,7 +75,8 @@ export async function POST(request: Request) {
       .single();
     if (error || !video) return NextResponse.json({ error: "영상 정보를 저장하지 못했습니다." }, { status: 500 });
     return NextResponse.json({ video }, { status: 201 });
-  } catch {
+  } catch (cause) {
+    console.error("VIDEO_SAVE_FAILED", cause);
     return NextResponse.json({ error: "저장된 영상 정보를 확인하지 못했습니다." }, { status: 404 });
   }
 }
