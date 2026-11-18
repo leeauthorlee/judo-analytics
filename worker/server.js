@@ -165,8 +165,30 @@ async function handleTask(request, response) {
     if (mediaError) throw mediaError;
 
     if (!isModelConfigured()) {
-      await setFailed(analysisId, "MODEL_NOT_CONFIGURED");
-      response.writeHead(200).end("Video validated; model adapter is not configured");
+      const temporaryResult = {
+        provider: "unavailable",
+        providerVersion: "offline",
+        rulesetId: "ruleset_unknown",
+        disclaimer: "분석 모델이 연결되지 않아 판단 불가로 표시합니다. 공식 판정이 아닙니다.",
+        events: [{
+          startMs: 0,
+          endMs: 1000,
+          techniqueId: null,
+          score: "uncertain",
+          toriRole: "unknown",
+          ukeRole: "unknown",
+          observations: ["분석 모델이 연결되지 않아 기술과 점수를 판단할 수 없습니다."],
+          missingEvidence: ["모델 추론 결과", "관절 시계열"],
+          confidenceBand: "low",
+        }],
+      };
+      await storeResult(analysisId, analysis.ruleset_id, temporaryResult);
+      await supabase.from("video_analyses").update({
+        status: "review_required",
+        result_json: temporaryResult,
+        completed_at: new Date().toISOString(),
+      }).eq("id", analysisId);
+      response.writeHead(200).end("Temporary result stored");
       return;
     }
 

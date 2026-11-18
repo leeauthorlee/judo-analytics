@@ -33,7 +33,7 @@ button:disabled { cursor: not-allowed; opacity: .45; }
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 88px;
+  height: 72px;
   padding: 0 clamp(20px, 5vw, 76px);
   display: flex;
   align-items: center;
@@ -45,18 +45,18 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .wordmark {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: clamp(24px, 2.2vw, 34px);
+  gap: 8px;
+  font-size: clamp(20px, 1.6vw, 26px);
   font-weight: 500;
   white-space: nowrap;
 }
-.wordmark span { font-size: clamp(12px, 1vw, 16px); font-weight: 500; color: var(--muted); letter-spacing: .04em; }
-.site-header nav { display: flex; align-items: center; gap: clamp(20px, 3vw, 48px); }
-.site-header nav a { font-size: clamp(18px, 1.7vw, 26px); font-weight: 500; color: var(--ink); white-space: nowrap; transition: color .33s var(--ease); }
+.wordmark span { font-size: clamp(10px, 0.7vw, 13px); font-weight: 500; color: var(--muted); letter-spacing: .04em; }
+.site-header nav { display: flex; align-items: center; gap: clamp(18px, 2.2vw, 36px); }
+.site-header nav a { font-size: clamp(16px, 1.25vw, 20px); font-weight: 500; color: var(--ink); white-space: nowrap; transition: color .33s var(--ease); }
 .site-header nav a:hover { color: var(--blue); }
-.account-menu { display: flex; align-items: center; gap: 18px; }
-.account-email { font-size: clamp(13px, 1.2vw, 18px); color: var(--muted); }
-.text-button { font-size: clamp(14px, 1.2vw, 20px); font-weight: 400; color: var(--muted); padding: 4px 0; transition: color .33s var(--ease); }
+.account-menu { display: flex; align-items: center; gap: 14px; }
+.account-email { font-size: clamp(12px, 0.9vw, 15px); color: var(--muted); }
+.text-button { font-size: clamp(13px, 0.95vw, 16px); font-weight: 400; color: var(--muted); padding: 4px 0; transition: color .33s var(--ease); }
 .text-button:hover { color: var(--blue); }
 .text-link { font-size: 14px; font-weight: 400; color: var(--muted); transition: color .33s var(--ease); }
 .text-link:hover { color: var(--blue); }
@@ -83,7 +83,7 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 /* Hero */
 .hero {
   min-height: 640px;
-  padding: 90px clamp(24px, 11vw, 170px);
+  padding: 90px clamp(20px, 5vw, 76px);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -91,8 +91,8 @@ button:disabled { cursor: not-allowed; opacity: .45; }
   background: var(--ash);
 }
 .hero-copy { position: relative; z-index: 1; max-width: 62%; }
-.eyebrow { margin: 0 0 18px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .2em; }
-.hero h1 { margin: 0; font-size: clamp(36px, 3.4vw, 48px); font-weight: 700; line-height: 1.3; letter-spacing: -.045em; }
+.eyebrow { margin: 0 0 18px; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: .12em; }
+.hero h1 { margin: 0; font-size: clamp(36px, 3.4vw, 48px); font-weight: 500; line-height: 1.3; letter-spacing: normal; }
 .hero-description { margin: 22px 0 30px; color: var(--body); font-size: 14px; line-height: 1.9; }
 .hero .primary-button { min-width: 0; padding-inline: 22px; }
 .hero-mark {
@@ -194,6 +194,11 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .form-panel .primary-button { justify-self: start; }
 .diary-list { margin-top: 32px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
 .diary-entry { display: grid; gap: 8px; align-content: start; }
+.diary-thumb { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; background-color: var(--ash); }
+.result-card { max-width: 720px; padding: 32px; background: var(--ash); display: grid; gap: 8px; }
+.result-card strong { font-size: 20px; font-weight: 500; }
+.result-card span { color: var(--muted); font-size: 13px; }
+.result-card p { margin: 8px 0 0; color: var(--body); font-size: 14px; line-height: 1.7; }
 .diary-entry > span { color: var(--muted); font-size: 12px; }
 .diary-entry h3 { margin: 0; font-size: 17px; font-weight: 500; }
 .diary-entry p { margin: 0; color: var(--body); font-size: 14px; line-height: 1.7; white-space: pre-wrap; }

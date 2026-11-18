@@ -31,14 +31,15 @@ export async function POST(request: Request) {
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
-        const match = pathname.match(/^workspaces\/([a-f0-9-]{36})\/([a-f0-9-]{36})\.mp4$/i);
+        const match = pathname.match(/^workspaces\/([a-f0-9-]{36})\/([a-f0-9-]{36})\.(mp4|jpg)$/i);
         if (!match || match[1].toLowerCase() !== user.id.toLowerCase()) {
-          throw new Error("Invalid video path");
+          throw new Error("Invalid upload path");
         }
+        const isThumbnail = match[3].toLowerCase() === "jpg";
 
         return {
-          allowedContentTypes: ["video/mp4"],
-          maximumSizeInBytes: MAX_VIDEO_BYTES,
+          allowedContentTypes: [isThumbnail ? "image/jpeg" : "video/mp4"],
+          maximumSizeInBytes: isThumbnail ? 5 * 1024 * 1024 : MAX_VIDEO_BYTES,
           addRandomSuffix: false,
           tokenPayload: JSON.stringify({ userId: user.id, purpose: "judo-analysis-upload" }),
         };

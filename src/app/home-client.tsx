@@ -19,6 +19,8 @@ type AnalysisEvent = {
   techniqueId: string | null;
   score: "ippon" | "waza_ari" | "yuko" | "no_score" | "uncertain";
   confidenceBand: "low" | "medium" | "high";
+  observations?: string[];
+  missingEvidence?: string[];
 };
 
 type Analysis = {
@@ -46,6 +48,7 @@ type Diary = {
   title: string;
   note: string | null;
   created_at: string;
+  thumbnailUrl: string | null;
 };
 
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
@@ -101,6 +104,7 @@ export default function HomeClient({
   const [diaryTitle, setDiaryTitle] = useState("");
   const [diaryNote, setDiaryNote] = useState("");
   const [selectedHighlightIds, setSelectedHighlightIds] = useState<string[]>([]);
+  const [temporaryResult, setTemporaryResult] = useState<Analysis["result_json"]>(null);
 
   useEffect(() => () => {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -147,6 +151,33 @@ export default function HomeClient({
     selectVideo(event.dataTransfer.files[0]);
   }
 
+  async function createThumbnail(source: File): Promise<File | null> {
+    const objectUrl = URL.createObjectURL(source);
+    const element = document.createElement("video");
+    element.preload = "metadata";
+    element.muted = true;
+    element.src = objectUrl;
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const timer = window.setTimeout(resolve, 2500);
+        element.onloadeddata = () => { window.clearTimeout(timer); resolve(); };
+        element.onerror = () => { window.clearTimeout(timer); reject(new Error("thumbnail")); };
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = 320;
+      canvas.height = 180;
+      const context = canvas.getContext("2d");
+      if (!context || !element.videoWidth) return null;
+      context.drawImage(element, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.7));
+      return blob ? new File([blob], "thumbnail.jpg", { type: "image/jpeg" }) : null;
+    } catch {
+      return null;
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
   async function uploadAndQueue() {
     if (!video) return;
     setBusy(true);
@@ -161,6 +192,21 @@ export default function HomeClient({
         multipart: true,
       });
 
+      let thumbnailKey: string | null = null;
+      try {
+        const thumb = await createThumbnail(video);
+        if (thumb) {
+          thumbnailKey = `workspaces/${userId}/${crypto.randomUUID()}.jpg`;
+          await upload(thumbnailKey, thumb, {
+            access: "private",
+            handleUploadUrl: "/api/uploads",
+            contentType: "image/jpeg",
+          });
+        }
+      } catch {
+        thumbnailKey = null;
+      }
+
       const videoResponse = await fetch("/api/videos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -172,14 +218,15 @@ export default function HomeClient({
       const analysisResponse = await fetch("/api/analyses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId: videoBody.video.id }),
+        body: JSON.stringify({ videoId: videoBody.video.id, thumbnailKey }),
       });
       const analysisBody = await analysisResponse.json();
       if (!analysisResponse.ok) throw new Error(analysisBody.error ?? "분석 작업을 등록하지 못했습니다.");
 
+      setTemporaryResult(analysisBody.result ?? null);
       setMessage(
-        analysisBody.analysis.dispatchStatus === "worker_not_configured"
-          ? "영상이 저장되었고 분석 작업도 등록했습니다. 워커 연결 후 처리됩니다."
+        analysisBody.autoSavedDiaryId
+          ? "판단 불가 결과와 점수, 썸네일이 일기에 자동 저장되었습니다."
           : "영상 저장 및 분석 요청이 완료되었습니다.",
       );
       setSelectedVideo(null);
@@ -284,6 +331,20 @@ export default function HomeClient({
 
       {error && <p className="feedback error" role="alert">{error}</p>}
       {message && <p className="feedback notice" role="status">{message}</p>}
+
+      {temporaryResult?.events?.map((event, index) => (
+        <section className="section temporary-result" key={index}>
+          <div className="section-heading">
+            <p className="eyebrow">ANALYSIS RESULT</p>
+            <h2>판정 결과</h2>
+          </div>
+          <div className="result-card">
+            <strong>판단 불가</strong>
+            <span>점수: {scoreLabel(event.score)} · 신뢰도 {event.confidenceBand}</span>
+            <p>{event.observations?.[0] ?? "판단할 수 없습니다."}</p>
+          </div>
+        </section>
+      ))}
 
       <section className="section" id="analysis">
         <div className="section-heading">
@@ -422,6 +483,13 @@ export default function HomeClient({
         <div className="diary-list">
           {diaries.map((diary) => (
             <article className="diary-entry" key={diary.id}>
+              {diary.thumbnailUrl && (
+                <div
+                  className="diary-thumb"
+                  style={{ backgroundImage: `url("${diary.thumbnailUrl}")` }}
+                  aria-hidden="true"
+                />
+              )}
               <span>{diary.entry_date}</span>
               <h3>{diary.title}</h3>
               {diary.note && <p>{diary.note}</p>}

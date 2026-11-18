@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { head } from "@vercel/blob";
 import SiteHeader from "@/app/components/site-header";
 import HomeClient from "@/app/home-client";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +12,15 @@ export default async function Home() {
   let analyses: Awaited<ReturnType<typeof getAnalyses>> = [];
   let highlights: Awaited<ReturnType<typeof getHighlights>> = [];
   let diaries: Awaited<ReturnType<typeof getDiaries>> = [];
+  type DiaryWithThumb = {
+    id: string;
+    entry_date: string;
+    title: string;
+    note: string | null;
+    created_at: string;
+    thumbnailUrl: string | null;
+  };
+  let diariesWithThumb: DiaryWithThumb[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
@@ -31,6 +41,34 @@ export default async function Home() {
         analyses = await getAnalyses(supabase, ids);
         highlights = await getHighlights(supabase, ids);
         diaries = await getDiaries(supabase, workspace.id);
+
+        const thumbnailUrls = new Map<string, string>();
+        if (process.env.BLOB_READ_WRITE_TOKEN) {
+          for (const item of highlights) {
+            if (!item.thumbnail_key) continue;
+            try {
+              const blob = await head(item.thumbnail_key, { token: process.env.BLOB_READ_WRITE_TOKEN });
+              thumbnailUrls.set(item.id, blob.downloadUrl);
+            } catch {
+              // 썸네일을 읽을 수 없으면 표시하지 않습니다.
+            }
+          }
+        }
+        const diaryThumbnails = new Map<string, string>();
+        for (const diary of diaries) {
+          for (const link of diary.diary_entry_highlights ?? []) {
+            const url = thumbnailUrls.get(link.highlight_id);
+            if (url && !diaryThumbnails.has(diary.id)) diaryThumbnails.set(diary.id, url);
+          }
+        }
+        diariesWithThumb = diaries.map((diary) => ({
+          id: diary.id,
+          entry_date: diary.entry_date,
+          title: diary.title,
+          note: diary.note,
+          created_at: diary.created_at,
+          thumbnailUrl: diaryThumbnails.get(diary.id) ?? null,
+        }));
       }
     }
   }
@@ -45,7 +83,7 @@ export default async function Home() {
         videos={videos}
         analyses={analyses}
         highlights={highlights}
-        diaries={diaries}
+        diaries={diariesWithThumb}
       />
     </main>
   );
@@ -75,7 +113,7 @@ async function getHighlights(supabase: Awaited<ReturnType<typeof createClient>>,
   if (!videoIds.length) return [];
   const { data } = await supabase
     .from("highlights")
-    .select("id,video_id,event_id,start_ms,end_ms,title,created_at")
+    .select("id,video_id,event_id,start_ms,end_ms,title,thumbnail_key,created_at")
     .in("video_id", videoIds)
     .order("created_at", { ascending: false });
   return data ?? [];
@@ -84,7 +122,7 @@ async function getHighlights(supabase: Awaited<ReturnType<typeof createClient>>,
 async function getDiaries(supabase: Awaited<ReturnType<typeof createClient>>, workspaceId: string) {
   const { data } = await supabase
     .from("diary_entries")
-    .select("id,entry_date,title,note,created_at")
+    .select("id,entry_date,title,note,created_at,diary_entry_highlights(highlight_id)")
     .eq("workspace_id", workspaceId)
     .order("entry_date", { ascending: false });
   return data ?? [];
