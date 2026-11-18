@@ -37,7 +37,8 @@ export async function POST(request: Request) {
   if (error || !analysis) return NextResponse.json({ error: "분석 작업을 등록하지 못했습니다. DB 마이그레이션을 확인해 주세요." }, { status: 500 });
   try {
     if (!await enqueueAnalysisTask(analysis.id)) throw new Error("Queue unavailable");
-  } catch {
+  } catch (cause) {
+    console.error("ANALYSIS_DISPATCH_FAILED", analysis.id, cause);
     const { error: markError } = await supabase.rpc("fail_analysis_dispatch", { target_id: analysis.id });
     if (markError) console.error("ANALYSIS_DISPATCH_STATUS_FAILED", markError.code);
     return NextResponse.json({ error: "분석 작업 전송에 실패했습니다.", analysisId: analysis.id }, { status: 503 });
