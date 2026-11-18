@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     blob = await head(pathname, { token: process.env.BLOB_READ_WRITE_TOKEN });
   } catch (cause) {
     console.error("BLOB_HEAD_FAILED", pathname, cause);
-    return NextResponse.json({ error: "업로드된 영상을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: `업로드된 영상을 찾을 수 없습니다: ${cause instanceof Error ? cause.message : "unknown"}` }, { status: 404 });
   }
 
   try {
@@ -77,6 +77,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ video }, { status: 201 });
   } catch (cause) {
     console.error("VIDEO_SAVE_FAILED", cause);
-    return NextResponse.json({ error: "저장된 영상 정보를 확인하지 못했습니다." }, { status: 404 });
+    return NextResponse.json({ error: `저장된 영상 정보를 확인하지 못했습니다: ${cause instanceof Error ? cause.message : "unknown"}` }, { status: 404 });
   }
 }
