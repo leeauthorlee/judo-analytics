@@ -30,23 +30,29 @@ Import the Git repository into Vercel and set the production domain. Add the var
 | `GOOGLE_CLOUD_TASKS_QUEUE` | Queue name, default `judo-analysis` |
 | `GOOGLE_CLOUD_WORKER_URL` | Private Cloud Run service URL, without `/tasks` |
 | `GOOGLE_CLOUD_TASKS_SERVICE_ACCOUNT` | Service account email used for Cloud Tasks OIDC tokens |
-| `GOOGLE_CLOUD_SERVICE_ACCOUNT_JSON` | Server-only service account JSON with permission to create tasks |
+| `GCP_PROJECT_NUMBER` | Numeric Google Cloud project number (WIF audience) |
+| `GCP_WORKLOAD_IDENTITY_POOL_ID` | Workload Identity Pool id that trusts Vercel OIDC (`vercel`) |
+| `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID` | Workload Identity Pool provider id (`vercel`) |
+| `WORKER_API_SECRET` | Shared secret the worker sends to `/api/worker/blob-url` |
 
-Do not commit `.env.local`, service account JSON, OAuth secrets, Blob tokens, or Supabase service-role keys. This project does not need a Supabase service-role key on Vercel; user-scoped server clients rely on RLS.
+Service account keys are intentionally **not** used: the organization policy `constraints/iam.disableServiceAccountKeyCreation` blocks key creation, and Vercel OIDC + Workload Identity Federation issues short-lived tokens instead. Do not commit `.env.local`, OAuth secrets, Blob tokens, or Supabase service-role keys. This project does not need a Supabase service-role key on Vercel; user-scoped server clients rely on RLS.
 
 ## 3. Google Cloud worker
 
-Create a queue and service accounts in the same project/region. Grant the Vercel dispatcher identity permission to create Cloud Tasks. Grant the task OIDC service account `roles/run.invoker` on the Cloud Run worker and `roles/iam.serviceAccountUser` where required to mint the OIDC token. Keep the worker service unauthenticated access disabled.
+Create a queue and service accounts in the same project/region. Grant the Vercel OIDC principal (`principal://iam.googleapis.com/projects/<number>/locations/global/workloadIdentityPools/vercel/subject/owner:<team>:project:<project>:environment:production`) `roles/iam.serviceAccountTokenCreator` on the enqueuer service account so it can mint short-lived tokens. Grant the enqueuer `roles/cloudtasks.enqueuer` and `roles/run.invoker`. Keep the worker service unauthenticated access disabled; Cloud Tasks supplies the OIDC token.
 
-Build from the repository root with `docker build -f worker/Dockerfile -t judo-analysis-worker .`. Place the trained artifact at `analysis-model/models/judo_r3d18.pt` first (it is not in Git). The image includes Python, CPU inference dependencies and FFmpeg. Deploy privately to Cloud Run with concurrency 1 initially. Supply these secrets through Secret Manager / Cloud Run secret references:
+Build with `gcloud builds submit --tag <region>-docker.pkg.dev/<project>/judo-analytics/judo-worker:latest --ignore-file=.dockerignore .` from the repository root (the root `Dockerfile` is a copy of `worker/Dockerfile`). The build's service account needs `roles/storage.objectViewer` on the Cloud Build log bucket and `roles/artifactregistry.writer` on the repository. Place the trained artifact at `analysis-model/models/judo_r3d18.pt` first (it is not in Git). The image includes Python 3.11, CPU inference dependencies and FFmpeg; `numpy` is pinned to a Python 3.11-compatible version. Deploy privately to Cloud Run with 2 GiB memory, 2 CPUs and concurrency 4. Supply these secrets through Secret Manager / Cloud Run secret references:
 
 | Worker variable | Source |
 |---|---|
 | `SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase server-only service-role key |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob token that can read the private video store |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase server-only secret key (`worker_server`) |
+| `WEB_APP_URL` | Exact app origin; used to request short-lived Blob URLs |
+| `WORKER_API_SECRET` | Same value as the Vercel variable of that name |
 
-Cloud Tasks sends `POST <worker-url>/tasks` with an OIDC token and `{ "analysis_id": "..." }`. The worker loads `input_json.startMs/endMs`, validates media and calls the Python checkpoint. A DB transaction stores events, real-result highlights/diaries and `review_required` status. Missing weights yield `MODEL_NOT_CONFIGURED`. Use a 600-second request/dispatch deadline initially and configure retry limits; inference does not run inside Vercel.
+The worker does **not** hold a Blob token. It calls `POST <web-app-url>/api/worker/blob-url` with `x-worker-secret` and a validated storage path; the app returns a short-lived presigned URL that the worker uses to download the private video. Missing weights yield `MODEL_NOT_CONFIGURED`.
+
+Cloud Tasks sends `POST <worker-url>/tasks` with an OIDC token and `{ "analysis_id": "..." }`. The worker loads `input_json.startMs/endMs`, validates media and calls the Python checkpoint. A DB transaction stores events, real-result highlights/diaries and `review_required` status. Use a 600-second request/dispatch deadline initially and configure retry limits; inference does not run inside Vercel.
 
 ## 4. OAuth provider setup checklist
 
