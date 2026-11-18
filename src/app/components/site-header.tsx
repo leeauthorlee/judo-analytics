@@ -4,13 +4,14 @@ import { signOut } from "@/app/login/actions";
 export default function SiteHeader({ email }: { email?: string | null }) {
   return (
     <header className="site-header">
-      <Link className="wordmark" href="/" aria-label="Judo Analytics 홈">
+      <Link className="wordmark" href="#top" aria-label="Judo Analytics 홈">
         JUDO<span>ANALYTICS</span>
       </Link>
       <nav aria-label="주 메뉴">
-        <Link href="/analysis">영상 분석</Link>
-        <Link href="/records">나의 기록</Link>
-        <Link href="/ranking">유도 랭킹</Link>
+        <Link href="#analysis">영상 분석</Link>
+        <Link href="#history">작업 내역</Link>
+        <Link href="#diary">유도 일기</Link>
+        <Link href="#ranking">유도 랭킹</Link>
       </nav>
       <div className="account-menu">
         {email ? (
