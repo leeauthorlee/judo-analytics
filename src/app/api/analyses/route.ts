@@ -31,6 +31,20 @@ export async function POST(request: Request) {
   if (video.duration_ms !== null && body.endMs > video.duration_ms) {
     return NextResponse.json({ error: "선택 구간이 영상 길이를 초과합니다." }, { status: 400 });
   }
+
+  // Bound AI cost: at most 2 in-flight jobs and 20 requests per hour per actor.
+  const [{ count: active }, { count: recent }] = await Promise.all([
+    supabase.from("video_analyses").select("id", { count: "exact", head: true }).in("status", ["queued", "processing"]),
+    supabase.from("video_analyses").select("id", { count: "exact", head: true })
+      .gte("created_at", new Date(Date.now() - 60 * 60 * 1000).toISOString()),
+  ]);
+  if ((active ?? 0) >= 2) {
+    return NextResponse.json({ error: "진행 중인 분석이 2건입니다. 완료 후 다시 시도해 주세요." }, { status: 429 });
+  }
+  if ((recent ?? 0) >= 20) {
+    return NextResponse.json({ error: "시간당 분석 요청 한도를 초과했습니다." }, { status: 429 });
+  }
+
   const { data: analysis, error } = await supabase.from("video_analyses")
     .insert({ video_id: video.id, status: "queued", input_json: { startMs: body.startMs, endMs: body.endMs, thumbnailKey } })
     .select("id,status,created_at").single();

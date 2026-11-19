@@ -9,7 +9,6 @@ export default function SiteHeader({ email }: { email?: string | null }) {
       </Link>
       <nav aria-label="주 메뉴">
         <Link href="#analysis">영상 분석</Link>
-        <Link href="#history">작업 내역</Link>
         <Link href="#diary">유도 일기</Link>
         <Link href="#ranking">유도 랭킹</Link>
       </nav>

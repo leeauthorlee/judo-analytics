@@ -1,21 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import AnalysisReviewForm, { type AnalysisReview } from "@/app/components/analysis-review";
+import DiaryModal from "@/app/components/diary-modal";
+import RankingBoard from "@/app/components/ranking-board";
 import type { JudoAnalysisEvent } from "@/lib/analysis/types";
+import { isPendingDiary } from "@/lib/diary";
+import { POINTS_PER_DIARY, techniqueName } from "@/lib/scoring/policy";
 
-type Video = {
-  id: string;
-  original_name: string;
-  size_bytes: number;
-  status: string;
-  created_at: string;
-};
-
+type Video = { id: string; original_name: string; size_bytes: number; status: string; created_at: string };
 type AnalysisEvent = JudoAnalysisEvent;
-
 type Analysis = {
   id: string;
   video_id: string;
@@ -25,135 +21,136 @@ type Analysis = {
   result_json: { events?: AnalysisEvent[]; provider?: string; providerVersion?: string; disclaimer?: string } | null;
   analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
 };
-
-type Highlight = {
-  id: string;
-  video_id: string;
-  event_id: string | null;
-  start_ms: number;
-  end_ms: number;
-  title: string;
-  created_at: string;
-};
-
-type Diary = {
-  id: string;
-  entry_date: string;
-  title: string;
-  note: string | null;
-  created_at: string;
-  thumbnailUrl: string | null;
-};
+type Diary = { id: string; entry_date: string; title: string; note: string | null; created_at: string; thumbnailUrl: string | null };
 
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
 
-function formatSize(size: number) {
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-}
-
+function formatSize(size: number) { return `${(size / (1024 * 1024)).toFixed(1)} MB`; }
 function formatTime(ms: number) {
   const seconds = Math.floor(ms / 1000);
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
-
-function scoreLabel(score: AnalysisEvent["score"]) {
-  return { ippon: "한판", waza_ari: "절반", yuko: "유효", no_score: "무득점", uncertain: "불확실" }[score];
-}
-
-function statusLabel(status: Analysis["status"]) {
-  return {
-    queued: "대기 중",
-    processing: "분석 중",
-    review_required: "검토 필요",
-    completed: "완료",
-    failed: "실패",
-  }[status];
+function errorText(code: string | null) {
+  if (code === "INVALID_ANALYSIS_INTERVAL") return "분석 구간이 올바르지 않습니다. 30초 이내 구간을 선택해 주세요.";
+  if (code === "MODEL_NOT_CONFIGURED") return "워커에 모델 파일이 설치되지 않았습니다.";
+  if (code === "CANCELLED") return "분석이 취소되었습니다. 새 영상으로 다시 시도해 주세요.";
+  return "분석에 실패했습니다. 잠시 후 다시 시도해 주세요.";
 }
 
 export default function HomeClient({
   userId,
+  email,
+  isGuest,
   videos,
   analyses,
-  highlights,
   diaries,
 }: {
   userId: string;
+  email: string | null;
+  isGuest: boolean;
   videos: Video[];
   analyses: Analysis[];
-  highlights: Highlight[];
   diaries: Diary[];
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
-  const [video, setVideo] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [savingEventId, setSavingEventId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [entryDate, setEntryDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [diaryTitle, setDiaryTitle] = useState("");
-  const [diaryNote, setDiaryNote] = useState("");
-  const [selectedHighlightIds, setSelectedHighlightIds] = useState<string[]>([]);
   const [duration, setDuration] = useState(0);
   const [startSeconds, setStartSeconds] = useState(0);
   const [endSeconds, setEndSeconds] = useState(0);
+  const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string } | null>(null);
+  const [highlight, setHighlight] = useState<Diary | null>(null);
 
-  useEffect(() => () => {
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-  }, []);
+  const activeVideo = videos[0] ?? null;
+  const activeAnalysis = activeVideo ? analyses.find((item) => item.video_id === activeVideo.id) ?? null : null;
+  const review = activeAnalysis
+    ? (Array.isArray(activeAnalysis.analysis_reviews) ? activeAnalysis.analysis_reviews[0] : activeAnalysis.analysis_reviews ?? undefined)
+    : undefined;
+  const confirmedName = review ? (techniqueName(review.technique_label) ?? (review.technique_label === "unsupported" ? "지원 외 기술" : "확인 불가")) : null;
+  const points = review ? (techniqueName(review.technique_label) ? POINTS_PER_DIARY : 0) : 0;
+  const event = activeAnalysis?.result_json?.events?.[0];
+  const isRunning = activeAnalysis?.status === "queued" || activeAnalysis?.status === "processing";
+
+  const phase = busy ? "uploading"
+    : file ? "select"
+    : isRunning ? "analyzing"
+    : activeAnalysis?.status === "review_required" || activeAnalysis?.status === "completed" ? "complete"
+    : activeAnalysis?.status === "failed" ? "failed"
+    : "upload";
+
+  const activeVideoIdRef = useRef<string | null>(null);
+  useEffect(() => { activeVideoIdRef.current = activeVideo?.id ?? null; }, [activeVideo?.id]);
+
+  useEffect(() => () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); }, []);
 
   useEffect(() => {
-    if (!analyses.some((item) => item.status === "queued" || item.status === "processing")) return;
-    const interval = window.setInterval(() => router.refresh(), 8000);
+    if (!isRunning) return;
+    const interval = window.setInterval(() => router.refresh(), 6000);
     return () => window.clearInterval(interval);
-  }, [analyses, router]);
+  }, [isRunning, router]);
 
-  function setSelectedVideo(file: File | null) {
+  // Best-effort release when leaving the page. The server TTL reaper is the
+  // authoritative cleanup for cases where this signal cannot be delivered.
+  useEffect(() => {
+    const handler = () => {
+      const id = activeVideoIdRef.current;
+      if (!id || typeof navigator.sendBeacon !== "function") return;
+      navigator.sendBeacon("/api/videos/release", new Blob([JSON.stringify({ videoId: id })], { type: "application/json" }));
+    };
+    window.addEventListener("pagehide", handler);
+    return () => window.removeEventListener("pagehide", handler);
+  }, []);
+
+  const registeredDiaries = diaries.filter((item) => !isPendingDiary(item.note));
+  // Pick once per diary set; keep the previous pick while it still exists so
+  // refreshes do not make the highlight flicker between entries.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setHighlight((previous) => {
+        if (previous && registeredDiaries.some((item) => item.id === previous.id)) return previous;
+        return registeredDiaries.length ? registeredDiaries[Math.floor(Math.random() * registeredDiaries.length)] : null;
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [diaries, registeredDiaries]);
+
+  function setSelectedFile(value: File | null) {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-    previewUrlRef.current = file ? URL.createObjectURL(file) : null;
+    previewUrlRef.current = value ? URL.createObjectURL(value) : null;
     setPreviewUrl(previewUrlRef.current);
-    setVideo(file);
+    setFile(value);
     setDuration(0); setStartSeconds(0); setEndSeconds(0);
   }
 
-  function selectVideo(file?: File) {
-    setError("");
-    setMessage("");
-    if (!file) return;
-    if (file.type !== "video/mp4" && !file.name.toLowerCase().endsWith(".mp4")) {
-      setSelectedVideo(null);
-      setError("MP4 파일만 선택할 수 있습니다.");
-      return;
+  function selectFile(value?: File) {
+    setError(""); setMessage("");
+    if (!value) return;
+    if (value.type !== "video/mp4" && !value.name.toLowerCase().endsWith(".mp4")) {
+      setSelectedFile(null); setError("MP4 파일만 선택할 수 있습니다."); return;
     }
-    if (file.size > MAX_VIDEO_BYTES) {
-      setSelectedVideo(null);
-      setError("파일 크기는 500 MB 이하여야 합니다.");
-      return;
+    if (value.size > MAX_VIDEO_BYTES) {
+      setSelectedFile(null); setError("파일 크기는 500 MB 이하여야 합니다."); return;
     }
-    setSelectedVideo(file);
+    setSelectedFile(value);
   }
 
-  function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    selectVideo(event.target.files?.[0]);
-    event.target.value = "";
+  function onFileChange(e: ChangeEvent<HTMLInputElement>) {
+    selectFile(e.target.files?.[0]); e.target.value = "";
   }
-
-  function onDrop(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    setDragging(false);
-    selectVideo(event.dataTransfer.files[0]);
+  function onDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault(); setDragging(false); selectFile(e.dataTransfer.files[0]);
   }
 
   async function createThumbnail(source: File): Promise<File | null> {
     const objectUrl = URL.createObjectURL(source);
     const element = document.createElement("video");
-    element.preload = "metadata";
-    element.muted = true;
-    element.src = objectUrl;
+    element.preload = "metadata"; element.muted = true; element.src = objectUrl;
     try {
       await new Promise<void>((resolve, reject) => {
         const timer = window.setTimeout(resolve, 2500);
@@ -161,155 +158,73 @@ export default function HomeClient({
         element.onerror = () => { window.clearTimeout(timer); reject(new Error("thumbnail")); };
       });
       const canvas = document.createElement("canvas");
-      canvas.width = 320;
-      canvas.height = 180;
+      canvas.width = 320; canvas.height = 180;
       const context = canvas.getContext("2d");
       if (!context || !element.videoWidth) return null;
       context.drawImage(element, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.7));
       return blob ? new File([blob], "thumbnail.jpg", { type: "image/jpeg" }) : null;
-    } catch {
-      return null;
-    } finally {
-      URL.revokeObjectURL(objectUrl);
-    }
+    } catch { return null; } finally { URL.revokeObjectURL(objectUrl); }
   }
 
   async function uploadAndQueue() {
-    if (!video) return;
+    if (!file) return;
     if (!duration || duration > 600 || !Number.isFinite(startSeconds) || !Number.isFinite(endSeconds) ||
         startSeconds < 0 || endSeconds <= startSeconds || endSeconds > duration || endSeconds - startSeconds > 30) {
-      setError("10분 이하 영상에서 분석할 공격 구간을 30초 이내로 지정해 주세요."); return;
+      setError("10분 이하 영상에서 30초 이내의 공격 구간을 선택해 주세요."); return;
     }
-    setBusy(true);
-    setError("");
-    setMessage("");
+    setBusy(true); setError(""); setMessage("");
     try {
       const pathname = `workspaces/${userId}/${crypto.randomUUID()}.mp4`;
-      await upload(pathname, video, {
-        access: "private",
-        handleUploadUrl: "/api/uploads",
-        contentType: "video/mp4",
-        multipart: true,
-      });
+      await upload(pathname, file, { access: "private", handleUploadUrl: "/api/uploads", contentType: "video/mp4", multipart: true });
 
       let thumbnailKey: string | null = null;
-      try {
-        const thumb = await createThumbnail(video);
-        if (thumb) {
-          thumbnailKey = `workspaces/${userId}/${crypto.randomUUID()}.jpg`;
-          await upload(thumbnailKey, thumb, {
-            access: "private",
-            handleUploadUrl: "/api/uploads",
-            contentType: "image/jpeg",
-          });
-        }
-      } catch {
-        thumbnailKey = null;
+      const thumb = await createThumbnail(file);
+      if (thumb) {
+        thumbnailKey = `workspaces/${userId}/${crypto.randomUUID()}.jpg`;
+        await upload(thumbnailKey, thumb, { access: "private", handleUploadUrl: "/api/uploads", contentType: "image/jpeg" });
       }
 
       const videoResponse = await fetch("/api/videos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pathname, originalName: video.name }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pathname, originalName: file.name }),
       });
       const videoBody = await videoResponse.json();
       if (!videoResponse.ok) throw new Error(videoBody.error ?? "영상 정보를 저장하지 못했습니다.");
 
       const analysisResponse = await fetch("/api/analyses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId: videoBody.video.id, thumbnailKey, startMs: Math.round(startSeconds * 1000), endMs: Math.round(endSeconds * 1000) }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videoId: videoBody.video.id, thumbnailKey,
+          startMs: Math.round(startSeconds * 1000), endMs: Math.round(endSeconds * 1000),
+        }),
       });
       const analysisBody = await analysisResponse.json();
       if (!analysisResponse.ok) throw new Error(analysisBody.error ?? "분석 작업을 등록하지 못했습니다.");
 
-      setMessage("기술 추천을 요청했습니다. 완료 후 실제 결과가 일기에 저장됩니다.");
-      setSelectedVideo(null);
+      setSelectedFile(null);
+      setMessage("AI가 선택 구간을 분석하고 있습니다. 결과는 이 화면에 표시됩니다.");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "업로드 또는 작업 등록에 실패했습니다.");
-      router.refresh();
-    } finally {
-      setBusy(false);
-    }
+      setError(cause instanceof Error ? cause.message : "업로드 또는 분석 요청에 실패했습니다.");
+    } finally { setBusy(false); }
   }
 
-  async function saveHighlight(videoId: string, event: AnalysisEvent) {
-    if (!event.eventId) return;
-    setSavingEventId(event.eventId);
-    setError("");
-    try {
-      const response = await fetch("/api/highlights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          videoId,
-          eventId: event.eventId,
-          startMs: event.startMs,
-          endMs: event.endMs,
-          title: `${formatTime(event.startMs)} ${event.techniqueId ?? "유도 기술 장면"}`,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "하이라이트를 저장하지 못했습니다.");
-      setMessage("하이라이트를 저장했습니다.");
-      router.refresh();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "하이라이트 저장에 실패했습니다.");
-    } finally {
-      setSavingEventId(null);
+  async function startNewAnalysis() {
+    setError(""); setMessage("");
+    if (activeVideo) {
+      const response = await fetch(`/api/videos/${activeVideo.id}`, { method: "DELETE" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(result.error ?? "이전 영상을 삭제하지 못했습니다. 결과를 유지합니다.");
+        return;
+      }
     }
+    setSelectedFile(null);
+    setDiaryModal(null);
+    setMessage("이전 영상과 분석 결과를 정리했습니다. 새 영상을 선택해 주세요.");
+    router.refresh();
   }
-
-  async function saveDiary(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    setError("");
-    setMessage("");
-    try {
-      const response = await fetch("/api/diaries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entryDate,
-          title: diaryTitle,
-          note: diaryNote,
-          highlightIds: selectedHighlightIds,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "일기를 저장하지 못했습니다.");
-      setDiaryTitle("");
-      setDiaryNote("");
-      setSelectedHighlightIds([]);
-      setMessage("일기를 저장했습니다.");
-      router.refresh();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "일기 저장에 실패했습니다.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function deleteVideo(video: Video) {
-    if (!window.confirm(`'${video.original_name}' 영상과 연결된 기록을 삭제할까요?`)) return;
-    setError("");
-    try {
-      const response = await fetch(`/api/videos/${video.id}`, { method: "DELETE" });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "영상을 삭제하지 못했습니다.");
-      setMessage("영상과 연결된 기록을 삭제했습니다.");
-      router.refresh();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "영상 삭제에 실패했습니다.");
-    }
-  }
-
-  const latestAnalysis = new Map<string, Analysis>();
-  for (const item of analyses) if (!latestAnalysis.has(item.video_id)) latestAnalysis.set(item.video_id, item);
-
-  const dayHighlights = highlights.filter((item) => item.created_at.slice(0, 10) === selectedDate);
 
   return (
     <>
@@ -336,197 +251,168 @@ export default function HomeClient({
           <p>MP4 · 최대 500 MB · 10분 이하 · 한 번의 공격 구간을 30초 이내로 선택</p>
         </div>
 
-        <div
-          className={`drop-zone${dragging ? " is-dragging" : ""}`}
-          onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={onDrop}
-        >
-          <input ref={inputRef} className="sr-only" type="file" accept="video/mp4,.mp4" onChange={onFileChange} />
-          <div className="upload-icon" aria-hidden="true">↑</div>
-          <h3>파일 업로드</h3>
-          <p>분석할 영상을 끌어 놓거나 선택하세요.</p>
-          <button className="secondary-button" type="button" onClick={() => inputRef.current?.click()}>파일 선택</button>
-        </div>
-
-        {video && (
-          <div className="selected-video">
-            <div className="selected-video-info">
-              <strong>{video.name}</strong>
-              <span>{formatSize(video.size)}</span>
-            </div>
-            {previewUrl && <video className="preview" src={previewUrl} controls preload="metadata"
-              onLoadedMetadata={(e) => { const seconds = e.currentTarget.duration;
-                if (Number.isFinite(seconds)) { setDuration(seconds); setEndSeconds(Math.floor(Math.min(seconds, 30) * 1000) / 1000); }
-              }} onError={() => setError("영상 메타데이터를 읽을 수 없습니다.")} />}
-            <div className="interval-inputs">
-              <label>시작 (초)<input type="number" min="0" step="0.001" value={startSeconds} onChange={(e) => setStartSeconds(Number(e.target.value))} /></label>
-              <label>종료 (초)<input type="number" min="0" max={duration || undefined} step="0.001" value={endSeconds} onChange={(e) => setEndSeconds(Number(e.target.value))} /></label>
-            </div>
-            <button className="primary-button" disabled={busy} onClick={() => void uploadAndQueue()}>
-              {busy ? "업로드 중…" : "분석 요청"}
-            </button>
-          </div>
-        )}
-
-        <div className="history-block" id="history">
-          <h3 className="subheading">작업 내역</h3>
-          {videos.length === 0 ? (
-            <p className="empty-state">아직 등록된 영상이 없습니다.</p>
-          ) : (
-            <div className="video-list">
-              {videos.map((item) => {
-                const analysis = latestAnalysis.get(item.id);
-                return (
-                  <article className="video-row" key={item.id}>
-                    <div className="video-row-info">
-                      <strong>{item.original_name}</strong>
-                      <span>{formatSize(item.size_bytes)} · {new Date(item.created_at).toLocaleString("ko-KR")}</span>
-                    </div>
-                    <span className="status">{analysis
-                      ? (Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews.length > 0 : Boolean(analysis.analysis_reviews))
-                        ? "사용자 확인 완료" : statusLabel(analysis.status)
-                      : "업로드 완료"}</span>
-                    {analysis?.status === "failed" && <p role="alert">{analysis.error_code === "INVALID_ANALYSIS_INTERVAL"
-                      ? "분석 구간이 올바르지 않습니다. 30초 이내 구간을 선택해 주세요."
-                      : analysis.error_code === "MODEL_NOT_CONFIGURED" ? "워커에 모델 파일을 설치해야 합니다."
-                        : "분석에 실패했습니다. 워커 연결과 영상 파일을 확인해 주세요."}</p>}
-                    <button className="text-button row-delete" type="button" onClick={() => void deleteVideo(item)}>삭제</button>
-                    {analysis?.result_json?.events?.map((event, index) => (
-                      <div className="analysis-event" key={event.eventId ?? `${item.id}-${index}`}>
-                        <div>
-                          <p>{formatTime(event.startMs)}–{formatTime(event.endMs)} · {event.serviceScore === "unreviewed" ? "AI 기술 추천 / 착지 사용자 확인" : scoreLabel(event.score)}</p>
-                          {event.techniqueCandidates && <AnalysisReviewForm analysisId={analysis.id} videoId={item.id} event={event}
-                            review={Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews[0] : analysis.analysis_reviews ?? undefined} />}
-                          {analysis.result_json?.disclaimer && <p>{analysis.result_json.disclaimer}</p>}
-                          {analysis.result_json?.providerVersion && <small>모델: {analysis.result_json.providerVersion}</small>}
-                        </div>
-                        {event.eventId && !highlights.some((highlight) => highlight.event_id === event.eventId) && (
-                          <button
-                            className="secondary-button event-button"
-                            type="button"
-                            disabled={savingEventId === event.eventId}
-                            onClick={() => void saveHighlight(item.id, event)}
-                          >
-                            {savingEventId === event.eventId ? "저장 중…" : "하이라이트 저장"}
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </article>
-                );
-              })}
+        <div className="analysis-stage" aria-live="polite">
+          {phase === "analyzing" && (
+            <div className="stage-card">
+              <div className="spinner" aria-hidden="true" />
+              <h3>분석 중입니다</h3>
+              <p>선택한 구간에서 기술 후보를 추천하고 있습니다. 잠시만 기다려 주세요.</p>
+              <p className="stage-note">진행률을 표시하지 않습니다. 분석이 끝나면 이 화면에 결과가 나타납니다.</p>
             </div>
           )}
-          <p className="disclaimer">한팔업어치기·허리껴치기·밭다리후리기·허벅다리걸기 후보를 추천합니다. 착지와 득점은 사용자가 확인하며 공식 판정이 아닙니다.</p>
+
+          {phase === "failed" && (
+            <div className="stage-card">
+              <h3>분석에 실패했습니다</h3>
+              <p role="alert">{errorText(activeAnalysis?.error_code ?? null)}</p>
+              <div className="button-row">
+                <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
+              </div>
+            </div>
+          )}
+
+          {(phase === "upload" || phase === "uploading") && (
+            <div className={`drop-zone${dragging ? " is-dragging" : ""}`}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)} onDrop={onDrop}>
+              <input ref={inputRef} className="sr-only" type="file" accept="video/mp4,.mp4" onChange={onFileChange} />
+              <div className="upload-icon" aria-hidden="true">↑</div>
+              <h3>파일 업로드</h3>
+              <p>분석할 영상을 끌어 놓거나 선택하세요.</p>
+              <button className="secondary-button" type="button" disabled={busy} onClick={() => inputRef.current?.click()}>파일 선택</button>
+            </div>
+          )}
+
+          {phase === "select" && file && (
+            <div className="selected-video">
+              <div className="selected-video-info"><strong>{file.name}</strong><span>{formatSize(file.size)}</span></div>
+              {previewUrl && <video className="preview" src={previewUrl} controls preload="metadata"
+                onLoadedMetadata={(e) => {
+                  const seconds = e.currentTarget.duration;
+                  if (Number.isFinite(seconds)) { setDuration(seconds); setEndSeconds(Math.floor(Math.min(seconds, 30) * 1000) / 1000); }
+                }} onError={() => setError("영상 메타데이터를 읽을 수 없습니다.")} />}
+              <div className="interval-inputs">
+                <label>시작 (초)<input type="number" min="0" step="0.001" value={startSeconds} onChange={(e) => setStartSeconds(Number(e.target.value))} /></label>
+                <label>종료 (초)<input type="number" min="0" max={duration || undefined} step="0.001" value={endSeconds} onChange={(e) => setEndSeconds(Number(e.target.value))} /></label>
+              </div>
+              <div className="button-row">
+                <button className="primary-button" type="button" disabled={busy} onClick={() => void uploadAndQueue()}>분석 요청</button>
+                <button className="secondary-button" type="button" disabled={busy} onClick={() => setSelectedFile(null)}>취소</button>
+              </div>
+            </div>
+          )}
+
+          {phase === "complete" && activeAnalysis && activeVideo && (
+            <div className="result-card">
+              <p className="eyebrow">분석 완료</p>
+              <div className="result-outcome">
+                <div>
+                  <span className="result-label">최종 판단 기술</span>
+                  <strong className="result-technique">{confirmedName ?? "확인 전"}</strong>
+                </div>
+                <div>
+                  <span className="result-label">획득 랭킹 점수</span>
+                  <strong className="result-points">{points > 0 ? `+${points}점` : "0점"}</strong>
+                  <span className="point-note">일기 등록 시 적립 · 분석만으로는 반영되지 않습니다</span>
+                </div>
+              </div>
+
+              <div className="result-section">
+                <h4>AI 추천 결과 <small>모델 점수 · 확정 아님</small></h4>
+                <ol className="candidate-list">
+                  {(event?.techniqueCandidates ?? []).map((candidate) => (
+                    <li key={candidate.techniqueId}>
+                      <span>{techniqueName(candidate.techniqueId) ?? candidate.techniqueId}</span>
+                      <span>{(candidate.modelScore * 100).toFixed(1)}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="result-note">분석 구간 {formatTime(event?.startMs ?? 0)}–{formatTime(event?.endMs ?? 0)} · 위 점수는 보정되지 않은 모델 점수이며 랭킹 점수와 다릅니다.</p>
+              </div>
+
+              <div className="result-section">
+                <h4>사용자 최종 확인</h4>
+                <AnalysisReviewForm analysisId={activeAnalysis.id} videoId={activeVideo.id} event={event ?? {
+                  startMs: 0, endMs: 0, techniqueId: null, score: "uncertain", toriRole: "unknown", ukeRole: "unknown",
+                  observations: [], missingEvidence: [], confidenceBand: "low",
+                }} review={review} />
+              </div>
+              <p className="disclaimer">{activeAnalysis.result_json?.disclaimer ?? "experiment model · 공식 심판 판정이 아닙니다."}</p>
+
+              <div className="button-row result-actions">
+                <button className="primary-button" type="button" disabled={!confirmedName || points === 0}
+                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: activeAnalysis.id, technique: confirmedName ?? "" })}>
+                  일기에 등록하기
+                </button>
+                <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
+              </div>
+              {isGuest && confirmedName && (
+                <p className="result-note">일기 등록과 랭킹은 <a className="text-link" href="/login">로그인</a> 후 이용할 수 있습니다.</p>
+              )}
+            </div>
+          )}
         </div>
       </section>
+
+      {diaryModal && (
+        <DiaryModal
+          technique={diaryModal.technique}
+          analysisId={diaryModal.analysisId}
+          onClose={() => setDiaryModal(null)}
+          onSaved={(text) => { setDiaryModal(null); setMessage(text); router.refresh(); }}
+        />
+      )}
 
       <section className="section" id="diary">
         <div className="section-heading">
           <p className="eyebrow">TRAINING DIARY</p>
           <h2>유도 일기</h2>
         </div>
-
-        <label className="date-filter">
-          날짜
-          <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
-        </label>
-        <h3 className="subheading">{selectedDate} 의 하이라이트</h3>
-        {dayHighlights.length === 0 ? (
-          <p className="empty-state">선택한 날짜에 저장된 하이라이트가 없습니다.</p>
+        {isGuest ? (
+          <p className="empty-state">일기는 <a className="text-link" href="/login">로그인</a> 후 이용할 수 있습니다.</p>
         ) : (
-          <div className="highlight-list">
-            {dayHighlights.map((item) => (
-              <article className="highlight-item" key={item.id}>
-                <strong>{item.title}</strong>
-                <span>{formatTime(item.start_ms)}–{formatTime(item.end_ms)}</span>
+          <>
+            <h3 className="subheading">오늘의 하이라이트</h3>
+            {highlight ? (
+              <article className="diary-entry highlight-card">
+                <span>{highlight.entry_date}</span>
+                <h4>{highlight.title}</h4>
+                {highlight.note && <p>{highlight.note}</p>}
+                <span>+{POINTS_PER_DIARY}점</span>
               </article>
-            ))}
-          </div>
+            ) : (
+              <p className="empty-state">등록된 일기가 없습니다. 분석 결과를 일기에 등록해 보세요.</p>
+            )}
+            <h3 className="subheading">내 일기</h3>
+            {registeredDiaries.length === 0 ? (
+              <p className="empty-state">아직 등록된 일기가 없습니다.</p>
+            ) : (
+              <div className="diary-list">
+                {registeredDiaries.map((diary) => (
+                  <article className="diary-entry" key={diary.id}>
+                    <span>{diary.entry_date}</span>
+                    <h4>{diary.title}</h4>
+                    {diary.note && <p>{diary.note}</p>}
+                    <span>+{POINTS_PER_DIARY}점</span>
+                  </article>
+                ))}
+              </div>
+            )}
+          </>
         )}
-
-        <form className="form-panel" onSubmit={(event) => void saveDiary(event)}>
-          <label>
-            날짜
-            <input type="date" value={entryDate} onChange={(event) => setEntryDate(event.target.value)} required />
-          </label>
-          <label>
-            제목
-            <input value={diaryTitle} onChange={(event) => setDiaryTitle(event.target.value)} maxLength={120} required />
-          </label>
-          <label>
-            메모
-            <textarea value={diaryNote} onChange={(event) => setDiaryNote(event.target.value)} maxLength={4000} rows={3} />
-          </label>
-          {highlights.length > 0 && (
-            <fieldset>
-              <legend>연결할 하이라이트</legend>
-              {highlights.map((item) => (
-                <label className="highlight-choice" key={item.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedHighlightIds.includes(item.id)}
-                    onChange={(event) => setSelectedHighlightIds((selected) =>
-                      event.target.checked
-                        ? [...selected, item.id]
-                        : selected.filter((id) => id !== item.id),
-                    )}
-                  />
-                  {item.title}
-                </label>
-              ))}
-            </fieldset>
-          )}
-          <button className="primary-button" type="submit" disabled={busy || !diaryTitle.trim()}>
-            {busy ? "저장 중…" : "일기 저장"}
-          </button>
-        </form>
-
-        <div className="diary-list">
-          {diaries.map((diary) => (
-            <article className="diary-entry" key={diary.id}>
-              {diary.thumbnailUrl && (
-                <div
-                  className="diary-thumb"
-                  style={{ backgroundImage: `url("${diary.thumbnailUrl}")` }}
-                  aria-hidden="true"
-                />
-              )}
-              <span>{diary.entry_date}</span>
-              <h3>{diary.title}</h3>
-              {diary.note && <p>{diary.note}</p>}
-            </article>
-          ))}
-        </div>
       </section>
 
       <section className="section" id="ranking">
         <div className="section-heading">
           <p className="eyebrow">JUDO RANKING</p>
           <h2>유도 랭킹</h2>
-          <p>-score 기준 사용자 순위-</p>
+          <p>일기 1건당 {POINTS_PER_DIARY}점 · 등록된 일기 합계 기준</p>
         </div>
-        <div className="ranking-layout">
-          <table className="ranking-table">
-            <thead>
-              <tr><th scope="col">순위</th><th scope="col">아이디</th><th scope="col">score</th></tr>
-            </thead>
-            <tbody>
-              <tr><td colSpan={3}>랭킹 데이터가 아직 없습니다.</td></tr>
-            </tbody>
-          </table>
-          <aside className="rank-panel">
-            <p className="eyebrow">MY RANK</p>
-            <h3>나의 순위</h3>
-            <p className="rank-value">—</p>
-            <p className="rank-note">분석 결과가 쌓이면 순위가 표시됩니다.</p>
-          </aside>
-        </div>
+        <RankingBoard isGuest={isGuest} />
       </section>
 
       <footer>
-        <p>JUDO ANALYTICS</p>
+        <span>{email ?? "비회원"} · {isGuest ? "임시 세션" : "회원"}</span>
         <span>AI 분석은 참고용이며 공식 심판 판정이 아닙니다.</span>
       </footer>
     </>
