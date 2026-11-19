@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import AnalysisReviewForm, { type AnalysisReview } from "@/app/components/analysis-review";
@@ -21,7 +21,7 @@ type Analysis = {
   result_json: { events?: AnalysisEvent[]; provider?: string; providerVersion?: string; disclaimer?: string } | null;
   analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
 };
-type Diary = { id: string; entry_date: string; title: string; note: string | null; created_at: string; thumbnailUrl: string | null };
+type Diary = { id: string; entry_date: string; title: string; note: string | null; created_at: string; thumbnailUrl: string | null; points: number };
 type LiveAnalysis = {
   id: string;
   videoId: string;
@@ -34,10 +34,6 @@ type LiveAnalysis = {
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
 
 function formatSize(size: number) { return `${(size / (1024 * 1024)).toFixed(1)} MB`; }
-function formatTime(ms: number) {
-  const seconds = Math.floor(ms / 1000);
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-}
 function errorText(code: string | null) {
   if (code === "INVALID_ANALYSIS_INTERVAL") return "분석 구간이 올바르지 않습니다. 30초 이내 구간을 선택해 주세요.";
   if (code === "MODEL_NOT_CONFIGURED") return "워커에 모델 파일이 설치되지 않았습니다.";
@@ -72,7 +68,8 @@ export default function HomeClient({
   const [duration, setDuration] = useState(0);
   const [startSeconds, setStartSeconds] = useState(0);
   const [endSeconds, setEndSeconds] = useState(0);
-  const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string } | null>(null);
+  const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string; landing: string } | null>(null);
+  const [reviewChoice, setReviewChoice] = useState<{ technique: string; landing: string } | null>(null);
   const [highlight, setHighlight] = useState<Diary | null>(null);
   const [freshStart, setFreshStart] = useState(false);
   const [live, setLive] = useState<LiveAnalysis | null>(null);
@@ -92,6 +89,12 @@ export default function HomeClient({
     ? (techniqueName(review.technique_label) ?? (review.technique_label === "unsupported" ? "지원 외 기술" : "확인 불가"))
     : aiName;
   const points = aiPointsFromResult(displayedAnalysis?.result_json);
+  const diaryTechnique = reviewChoice
+    ? (techniqueName(reviewChoice.technique) ??
+        (reviewChoice.technique === "unsupported" ? "지원 외 기술" :
+         reviewChoice.technique === "unknown" ? "확인 불가" : confirmedName ?? aiName ?? ""))
+    : confirmedName ?? aiName ?? "";
+  const diaryLanding = reviewChoice?.landing ?? "unknown";
   const event = displayedAnalysis?.result_json?.events?.[0];
   const isRunning = !live && (activeAnalysis?.status === "queued" || activeAnalysis?.status === "processing");
 
@@ -211,6 +214,21 @@ export default function HomeClient({
     } catch { return null; } finally { URL.revokeObjectURL(objectUrl); }
   }
 
+  // Restore the exact scroll position after a state transition swaps the
+  // upload/result panels. This prevents the page jumping to the footer.
+  const scrollRestoreRef = useRef<number | null>(null);
+  function captureScroll() { scrollRestoreRef.current = window.scrollY; }
+  useLayoutEffect(() => {
+    const target = scrollRestoreRef.current;
+    if (target === null) return;
+    scrollRestoreRef.current = null;
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo(0, target);
+    root.style.scrollBehavior = previous;
+  });
+
   // The hero link leaves a #analysis hash in the URL. Any later refresh would
   // jump to that anchor, so remove it before mutating the page state.
   function clearHash() {
@@ -226,6 +244,7 @@ export default function HomeClient({
         startSeconds < 0 || endSeconds <= startSeconds || endSeconds > duration || endSeconds - startSeconds > 30) {
       setError("10분 이하 영상에서 30초 이내의 공격 구간을 선택해 주세요."); return;
     }
+    captureScroll();
     clearHash();
     setFreshStart(false);
     setBusy(true); setError(""); setMessage("");
@@ -266,6 +285,7 @@ export default function HomeClient({
       const analysisBody = await analysisResponse.json();
       if (!analysisResponse.ok) throw new Error(analysisBody.error ?? "분석 작업을 등록하지 못했습니다.");
 
+      captureScroll();
       setSelectedFile(null);
       setLive({
         id: analysisBody.analysis.id,
@@ -287,6 +307,7 @@ export default function HomeClient({
     const result = await response.json().catch(() => ({}));
     if (!response.ok) { setError(result.error ?? "일기를 삭제하지 못했습니다."); return; }
     setMessage("일기를 삭제했습니다. 랭킹 점수가 다시 집계됩니다.");
+    captureScroll();
     refreshWithoutScroll();
   }
 
@@ -298,12 +319,13 @@ export default function HomeClient({
       setError(result.error ?? "이전 영상을 삭제하지 못했습니다. 결과를 유지합니다.");
       return;
     }
+    captureScroll();
     setSelectedFile(null);
     setDiaryModal(null);
     setLive(null);
+    setReviewChoice(null);
     setFreshStart(true);
     setMessage("이전 영상과 분석 결과를 정리했습니다. 새 영상을 선택해 주세요.");
-    refreshWithoutScroll();
   }
 
   return (
@@ -332,12 +354,19 @@ export default function HomeClient({
         </div>
 
         <div className="analysis-stage" aria-live="polite">
+          {phase === "uploading" && (
+            <div className="stage-card">
+              <div className="spinner" aria-hidden="true" />
+              <h3>분석 요청 시작</h3>
+              <p>영상을 업로드하고 분석 작업을 등록하고 있습니다.</p>
+            </div>
+          )}
+
           {phase === "analyzing" && (
             <div className="stage-card">
               <div className="spinner" aria-hidden="true" />
-              <h3>분석 중입니다</h3>
-              <p>선택한 구간에서 기술 후보를 추천하고 있습니다. 잠시만 기다려 주세요.</p>
-              <p className="stage-note">진행률을 표시하지 않습니다. 분석이 끝나면 이 화면에 결과가 나타납니다.</p>
+              <h3>분석 진행 중</h3>
+              <p>선택한 구간의 영상을 분석하고 있습니다. 잠시만 기다려 주세요.</p>
             </div>
           )}
 
@@ -351,7 +380,7 @@ export default function HomeClient({
             </div>
           )}
 
-          {(phase === "upload" || phase === "uploading") && (
+          {phase === "upload" && (
             <div className={`drop-zone${dragging ? " is-dragging" : ""}`}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)} onDrop={onDrop}>
@@ -389,7 +418,6 @@ export default function HomeClient({
                 <div>
                   <span className="result-label">최종 판단 기술</span>
                   <strong className="result-technique">{confirmedName ?? "판별 불가"}</strong>
-                  <span className="point-note">AI 판단 기술: {aiName ?? "판별 불가"}</span>
                 </div>
                 <div>
                   <span className="result-label">획득 랭킹 점수</span>
@@ -399,28 +427,23 @@ export default function HomeClient({
               </div>
 
               <div className="result-section">
-                <h4>분석 구간</h4>
-                <p className="result-note">{formatTime(event?.startMs ?? 0)}–{formatTime(event?.endMs ?? 0)} · AI가 판단한 최종 기술 하나만 표시합니다.</p>
-              </div>
-
-              <div className="result-section">
-                <h4>사용자 최종 확인</h4>
-                <AnalysisReviewForm
-                  analysisId={displayedAnalysis.id}
-                  videoId={displayedVideoId}
-                  event={event ?? {
-                    startMs: 0, endMs: 0, techniqueId: null, score: "uncertain", toriRole: "unknown", ukeRole: "unknown",
-                    observations: [], missingEvidence: [], confidenceBand: "low",
-                  }}
-                  review={review}
-                  onSaved={(saved) => setLive((previous) => previous ? { ...previous, analysis_reviews: saved } : previous)}
-                />
+                <div className="result-video">
+                  <AnalysisReviewForm
+                    videoId={displayedVideoId}
+                    event={event ?? {
+                      startMs: 0, endMs: 0, techniqueId: null, score: "uncertain", toriRole: "unknown", ukeRole: "unknown",
+                      observations: [], missingEvidence: [], confidenceBand: "low",
+                    }}
+                    review={review}
+                    onChange={setReviewChoice}
+                  />
+                </div>
               </div>
               <p className="disclaimer">{displayedAnalysis.result_json?.disclaimer ?? "실험 모델 결과이며 공식 심판 판정이 아닙니다."}</p>
 
               <div className="button-row result-actions">
                 <button className="primary-button" type="button" disabled={points === 0}
-                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: displayedAnalysis.id, technique: confirmedName ?? aiName ?? "" })}>
+                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: displayedAnalysis.id, technique: diaryTechnique, landing: diaryLanding })}>
                   일기에 등록하기
                 </button>
                 <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
@@ -436,9 +459,10 @@ export default function HomeClient({
       {diaryModal && (
         <DiaryModal
           technique={diaryModal.technique}
+          landing={diaryModal.landing}
           analysisId={diaryModal.analysisId}
           onClose={() => setDiaryModal(null)}
-          onSaved={(text) => { setDiaryModal(null); setMessage(text); refreshWithoutScroll(); }}
+          onSaved={(text) => { setDiaryModal(null); setMessage(text); captureScroll(); refreshWithoutScroll(); }}
         />
       )}
 
@@ -454,10 +478,11 @@ export default function HomeClient({
             <h3 className="subheading">오늘의 하이라이트</h3>
             {highlight ? (
               <article className="diary-entry highlight-card">
+                {highlight.thumbnailUrl && <div className="diary-thumb" style={{ backgroundImage: `url("${highlight.thumbnailUrl}")` }} aria-hidden="true" />}
                 <span>{highlight.entry_date}</span>
                 <h4>{highlight.title}</h4>
                 {highlight.note && <p>{highlight.note}</p>}
-                <span>+{POINTS_PER_DIARY}점</span>
+                <span className="diary-points">+{highlight.points}점</span>
               </article>
             ) : (
               <p className="empty-state">등록된 일기가 없습니다. 분석 결과를 일기에 등록해 보세요.</p>
@@ -469,10 +494,11 @@ export default function HomeClient({
               <div className="diary-list">
                 {registeredDiaries.map((diary) => (
                   <article className="diary-entry" key={diary.id}>
+                    {diary.thumbnailUrl && <div className="diary-thumb" style={{ backgroundImage: `url("${diary.thumbnailUrl}")` }} aria-hidden="true" />}
                     <span>{diary.entry_date}</span>
                     <h4>{diary.title}</h4>
                     {diary.note && <p>{diary.note}</p>}
-                    <span className="diary-points">+{POINTS_PER_DIARY}점</span>
+                    <span className="diary-points">+{diary.points}점</span>
                     <button className="text-button" type="button" onClick={() => void deleteDiary(diary.id)}>일기 삭제</button>
                   </article>
                 ))}

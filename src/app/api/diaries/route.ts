@@ -51,8 +51,8 @@ export async function POST(request: Request) {
   if (isGuestUser(user)) return NextResponse.json({ error: "일기를 등록하려면 로그인이 필요합니다." }, { status: 403 });
 
   let body: {
-    analysisId?: unknown; content?: unknown; entryDate?: unknown;
-    title?: unknown; note?: unknown; highlightIds?: unknown;
+    analysisId?: unknown; content?: unknown; technique?: unknown; landing?: unknown;
+    entryDate?: unknown; title?: unknown; note?: unknown; highlightIds?: unknown;
   };
   try {
     body = await request.json();
@@ -72,17 +72,34 @@ export async function POST(request: Request) {
     }
     const { data: analysis } = await supabase
       .from("video_analyses")
-      .select("id,status,result_json,analysis_reviews(technique_label)")
+      .select("id,status,result_json,analysis_reviews(technique_label,landing_choice)")
       .eq("id", analysisId)
       .maybeSingle();
     if (!analysis) return NextResponse.json({ error: "분석 결과를 찾을 수 없습니다." }, { status: 404 });
     if (!["review_required", "completed"].includes(analysis.status) || analysis.result_json?.provider !== "local-r3d18") {
       return NextResponse.json({ error: "완료된 분석만 일기에 등록할 수 있습니다." }, { status: 409 });
     }
-    const review = Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews[0] : analysis.analysis_reviews;
-    // The AI's single final technique is the default; a saved user review wins.
-    const name = techniqueName(review?.technique_label) ?? techniqueName(aiTechniqueId(analysis.result_json));
+    const savedReview = Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews[0] : analysis.analysis_reviews;
+    const chosenTechnique = typeof body.technique === "string" ? body.technique : null;
+    const chosenLanding = typeof body.landing === "string" &&
+      ["full", "partial", "none", "unknown"].includes(body.landing) ? body.landing : "unknown";
+    const technique = chosenTechnique && (techniqueName(chosenTechnique) || chosenTechnique === "unsupported" || chosenTechnique === "unknown")
+      ? chosenTechnique
+      : savedReview?.technique_label ?? aiTechniqueId(analysis.result_json);
+    const name = techniqueName(technique) ?? (technique === "unsupported" ? "지원 외 기술" : technique === "unknown" ? "확인 불가" : null);
     if (!name) return NextResponse.json({ error: "AI가 판단한 기술이 없어 일기에 등록할 수 없습니다." }, { status: 409 });
+
+    // Persist the user's final confirmation together with the diary entry.
+    if (savedReview?.technique_label !== technique || savedReview?.landing_choice !== chosenLanding) {
+      const { error: reviewError } = await supabase.from("analysis_reviews").upsert({
+        analysis_id: analysisId,
+        reviewer_user_id: user.id,
+        technique_label: technique,
+        landing_choice: chosenLanding,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "analysis_id" });
+      if (reviewError) return NextResponse.json({ error: "기술 확인 결과를 저장하지 못했습니다." }, { status: 500 });
+    }
 
     const { data: existing } = await supabase
       .from("diary_entries")

@@ -5,11 +5,13 @@ import { MAX_DIARY_CONTENT } from "@/lib/diary";
 
 export default function DiaryModal({
   technique,
+  landing,
   analysisId,
   onClose,
   onSaved,
 }: {
   technique: string;
+  landing: string;
   analysisId: string;
   onClose: () => void;
   onSaved: (message: string) => void;
@@ -30,14 +32,13 @@ export default function DiaryModal({
       const response = await fetch("/api/diaries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, content }),
+        body: JSON.stringify({ analysisId, content, technique, landing }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "일기를 저장하지 못했습니다.");
       onSaved(`일기를 저장했습니다. 랭킹 ${result.points ?? 0}점이 적립되었습니다.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "일기 저장에 실패했습니다.");
-    } finally {
       setBusy(false);
     }
   }
@@ -58,6 +59,7 @@ export default function DiaryModal({
               onChange={(event) => setContent(event.target.value)}
               maxLength={MAX_DIARY_CONTENT}
               rows={5}
+              disabled={busy}
               placeholder="오늘 연습에서 느낀 점을 적어 보세요."
             />
           </label>
@@ -65,7 +67,7 @@ export default function DiaryModal({
           {error && <p className="feedback error" role="alert">{error}</p>}
           <div className="modal-actions">
             <button className="primary-button" type="submit" disabled={busy || content.length > MAX_DIARY_CONTENT}>
-              {busy ? "저장 중…" : "저장"}
+              {busy ? "일기 저장 중…" : "일기 저장"}
             </button>
             <button className="secondary-button" type="button" disabled={busy} onClick={onClose}>취소</button>
           </div>

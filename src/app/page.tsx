@@ -2,6 +2,7 @@ import SiteHeader from "@/app/components/site-header";
 import HomeClient from "@/app/home-client";
 import { getViewer } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
+import { aiPointsFromResult, POINTS_PER_DIARY } from "@/lib/scoring/policy";
 
 type DiaryWithThumb = {
   id: string;
@@ -10,6 +11,7 @@ type DiaryWithThumb = {
   note: string | null;
   created_at: string;
   thumbnailUrl: string | null;
+  points: number;
 };
 
 export default async function Home() {
@@ -30,10 +32,11 @@ export default async function Home() {
       analyses = await getAnalyses(supabase, ids);
       if (!isGuest) {
         const diaries = await getDiaries(supabase, workspace.id);
-        const { data: highlights } = await supabase
-          .from("highlights")
-          .select("id,thumbnail_key")
-          .in("video_id", ids);
+        const highlightIds = [...new Set((diaries ?? []).flatMap((diary) =>
+          (diary.diary_entry_highlights ?? []).map((link) => link.highlight_id)))];
+        const { data: highlights } = highlightIds.length
+          ? await supabase.from("highlights").select("id,thumbnail_key").in("id", highlightIds)
+          : { data: [] };
         const thumbnailUrls = new Map<string, string>();
         for (const item of highlights ?? []) {
           if (item.thumbnail_key) {
@@ -47,6 +50,12 @@ export default async function Home() {
             if (url && !diaryThumbnails.has(diary.id)) diaryThumbnails.set(diary.id, url);
           }
         }
+        const sourceIds = [...new Set(diaries.map((diary) => diary.source_analysis_id).filter((id): id is string => Boolean(id)))];
+        const pointsById = new Map<string, number>();
+        if (sourceIds.length) {
+          const { data: sourceAnalyses } = await supabase.from("video_analyses").select("id,result_json").in("id", sourceIds);
+          for (const analysis of sourceAnalyses ?? []) pointsById.set(analysis.id, aiPointsFromResult(analysis.result_json));
+        }
         diariesWithThumb = diaries.map((diary) => ({
           id: diary.id,
           entry_date: diary.entry_date,
@@ -54,6 +63,7 @@ export default async function Home() {
           note: diary.note,
           created_at: diary.created_at,
           thumbnailUrl: diaryThumbnails.get(diary.id) ?? null,
+          points: diary.source_analysis_id ? pointsById.get(diary.source_analysis_id) ?? 0 : POINTS_PER_DIARY,
         }));
       }
     }
@@ -99,7 +109,7 @@ async function getAnalyses(supabase: WebSupabase, videoIds: string[]) {
 async function getDiaries(supabase: WebSupabase, workspaceId: string) {
   const { data } = await supabase
     .from("diary_entries")
-    .select("id,entry_date,title,note,created_at,diary_entry_highlights(highlight_id)")
+    .select("id,entry_date,title,note,created_at,source_analysis_id,diary_entry_highlights(highlight_id)")
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false });
   return data ?? [];
