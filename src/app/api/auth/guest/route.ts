@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getSupabaseConfig, isSupabaseConfigured } from "@/lib/supabase/config";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { getViewer } from "@/lib/access";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,10 @@ export const runtime = "nodejs";
  * APIs can refuse it. Cookie flags are handled by @supabase/ssr.
  */
 export async function POST() {
+  const viewer = await getViewer();
+  if (viewer) {
+    return NextResponse.json({ guest: viewer.isGuest, userId: viewer.userId });
+  }
   if (!isSupabaseConfigured() || !isAdminConfigured()) {
     return NextResponse.json({ error: "비회원 분석 설정이 필요합니다." }, { status: 503 });
   }

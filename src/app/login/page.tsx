@@ -3,6 +3,8 @@ import Link from "next/link";
 import { signInWithProvider } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isGuestUser } from "@/lib/access";
+import GuestLoginButton from "@/app/login/guest-login-button";
 
 export default async function LoginPage({
   searchParams,
@@ -13,7 +15,7 @@ export default async function LoginPage({
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) redirect("/");
+    if (user && !isGuestUser(user)) redirect("/");
   }
 
   const loginErrors: Record<string, string> = {
@@ -48,6 +50,7 @@ export default async function LoginPage({
               <input type="hidden" name="provider" value="kakao" />
               <button className="secondary-button" type="submit">Kakao로 계속</button>
             </form>
+            <GuestLoginButton />
           </div>
         )}
 

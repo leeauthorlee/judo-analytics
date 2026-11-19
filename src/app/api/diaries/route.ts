@@ -47,8 +47,8 @@ export async function POST(request: Request) {
   if (configError) return configError;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (isGuestUser(user)) return NextResponse.json({ error: "일기를 등록하려면 로그인이 필요합니다." }, { status: 403 });
+  if (!user) return NextResponse.json({ error: "해당 기능은 로그인이 필요합니다." }, { status: 401 });
+  if (isGuestUser(user)) return NextResponse.json({ error: "해당 기능은 로그인이 필요합니다." }, { status: 403 });
 
   let body: {
     analysisId?: unknown; content?: unknown; technique?: unknown; landing?: unknown;

@@ -89,6 +89,7 @@ export default function HomeClient({
   const [startSeconds, setStartSeconds] = useState(0);
   const [endSeconds, setEndSeconds] = useState(0);
   const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string; landing: string } | null>(null);
+  const [diaryLoginNotice, setDiaryLoginNotice] = useState(false);
   const [reviewChoice, setReviewChoice] = useState<{ technique: string; landing: string } | null>(null);
   const [highlight, setHighlight] = useState<Diary | null>(null);
   const [freshStart, setFreshStart] = useState(false);
@@ -358,7 +359,7 @@ export default function HomeClient({
             선택한 공격 구간에서 AI가 기술 후보를 추천합니다.<br />
             착지와 득점은 영상을 보고 직접 확인합니다.
           </p>
-          <a className="primary-button" href="#analysis">영상 선택하기</a>
+          <a className="primary-button" href="#analysis">영상 등록하러 가기</a>
         </div>
         <div className="hero-mark" aria-hidden="true"><span>柔</span><i /></div>
       </section>
@@ -462,12 +463,18 @@ export default function HomeClient({
               <p className="disclaimer">{displayedAnalysis.result_json?.disclaimer ?? "실험 모델 결과이며 공식 심판 판정이 아닙니다."}</p>
 
               <div className="button-row result-actions">
-                <button className="primary-button" type="button" disabled={points === 0}
-                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: displayedAnalysis.id, technique: diaryTechnique, landing: diaryLanding })}>
+                <button className="primary-button" type="button" disabled={!isGuest && points === 0}
+                  onClick={() => {
+                    if (isGuest) { setDiaryLoginNotice(true); return; }
+                    setDiaryModal({ analysisId: displayedAnalysis.id, technique: diaryTechnique, landing: diaryLanding });
+                  }}>
                   일기에 등록하기
                 </button>
                 <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
               </div>
+              {isGuest && diaryLoginNotice && (
+                <p className="feedback notice" role="status">해당 기능은 로그인이 필요합니다.</p>
+              )}
               {isGuest && confirmedName && (
                 <p className="result-note">일기 등록과 랭킹은 <a className="text-link" href="/login">로그인</a> 후 이용할 수 있습니다.</p>
               )}
