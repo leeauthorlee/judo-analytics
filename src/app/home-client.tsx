@@ -219,6 +219,16 @@ export default function HomeClient({
     } finally { setBusy(false); }
   }
 
+  async function deleteDiary(id: string) {
+    if (!window.confirm("이 일기를 삭제할까요? 등록된 랭킹 점수도 함께 반영됩니다.")) return;
+    setError(""); setMessage("");
+    const response = await fetch(`/api/diaries/${id}`, { method: "DELETE" });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) { setError(result.error ?? "일기를 삭제하지 못했습니다."); return; }
+    setMessage("일기를 삭제했습니다. 랭킹 점수가 다시 집계됩니다.");
+    router.refresh();
+  }
+
   async function startNewAnalysis() {
     setError(""); setMessage("");
     if (activeVideo) {
@@ -402,7 +412,8 @@ export default function HomeClient({
                     <span>{diary.entry_date}</span>
                     <h4>{diary.title}</h4>
                     {diary.note && <p>{diary.note}</p>}
-                    <span>+{POINTS_PER_DIARY}점</span>
+                    <span className="diary-points">+{POINTS_PER_DIARY}점</span>
+                    <button className="text-button" type="button" onClick={() => void deleteDiary(diary.id)}>일기 삭제</button>
                   </article>
                 ))}
               </div>
