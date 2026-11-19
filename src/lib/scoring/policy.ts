@@ -1,8 +1,9 @@
 /**
  * Single source of truth for ranking points.
  *
- * The model's uncalibrated candidate scores are NOT ranking points. This value
- * is only granted once a diary entry is registered for a confirmed technique.
+ * The AI produces one final technique and a confidence value. Points are
+ * derived from that AI result on the server (never from a client value) and
+ * are credited only when the diary entry is registered.
  */
 export const POINTS_PER_DIARY = 3;
 
@@ -25,7 +26,40 @@ export function techniqueName(id: unknown): string | null {
   return isSupportedTechnique(id) ? SUPPORTED_TECHNIQUES[id] : null;
 }
 
-/** Points granted for a diary entry. Unsupported/unknown techniques earn nothing. */
+export type AiResultLike = {
+  events?: Array<{
+    techniqueId?: string | null;
+    techniqueCandidates?: Array<{ techniqueId?: string; modelScore?: number }> | null;
+  }> | null;
+} | null | undefined;
+
+/** The AI's single final technique (top candidate), not a list of three. */
+export function aiTechniqueId(result: AiResultLike): string | null {
+  const event = result?.events?.[0];
+  if (!event) return null;
+  if (isSupportedTechnique(event.techniqueId)) return event.techniqueId;
+  const top = event.techniqueCandidates?.[0]?.techniqueId;
+  return isSupportedTechnique(top) ? top : null;
+}
+
+export function aiConfidence(result: AiResultLike): number {
+  const score = result?.events?.[0]?.techniqueCandidates?.[0]?.modelScore;
+  return typeof score === "number" && Number.isFinite(score) ? Math.min(1, Math.max(0, score)) : 0;
+}
+
+/**
+ * AI-result-based points. Supported technique + higher confidence earns more.
+ * Unsupported / undetermined results earn zero and are never silently replaced.
+ */
+export function aiPointsFromResult(result: AiResultLike): number {
+  if (!aiTechniqueId(result)) return 0;
+  const confidence = aiConfidence(result);
+  if (confidence >= 0.7) return POINTS_PER_DIARY;
+  if (confidence >= 0.4) return 2;
+  return 1;
+}
+
+/** Fallback for manually written diaries that have no AI analysis attached. */
 export function pointsForTechnique(id: unknown): number {
   return isSupportedTechnique(id) ? POINTS_PER_DIARY : 0;
 }

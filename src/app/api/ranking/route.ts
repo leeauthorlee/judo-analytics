@@ -4,7 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { isGuestUser } from "@/lib/access";
 import { isPendingDiary } from "@/lib/diary";
-import { maskDisplayName, POINTS_PER_DIARY } from "@/lib/scoring/policy";
+import { aiPointsFromResult, maskDisplayName, POINTS_PER_DIARY } from "@/lib/scoring/policy";
 
 export const runtime = "nodejs";
 
@@ -20,7 +20,7 @@ export async function GET() {
   const admin = createAdminClient();
   const [{ data: diaryRows, error: diaryError }, { data: workspaceRows, error: workspaceError }, { data: profileRows }] =
     await Promise.all([
-      admin.from("diary_entries").select("workspace_id,note"),
+      admin.from("diary_entries").select("workspace_id,note,source_analysis_id"),
       admin.from("workspaces").select("id,user_id"),
       admin.from("profiles").select("id,display_name"),
     ]);
@@ -31,15 +31,25 @@ export async function GET() {
 
   const names = new Map((profileRows ?? []).map((p) => [p.id, p.display_name]));
   const owners = new Map((workspaceRows ?? []).map((w) => [w.id, w.user_id]));
-  const counts = new Map<string, number>();
-  for (const diary of diaryRows ?? []) {
-    if (isPendingDiary(diary.note)) continue;
-    counts.set(diary.workspace_id, (counts.get(diary.workspace_id) ?? 0) + 1);
+
+  const registered = (diaryRows ?? []).filter((diary) => !isPendingDiary(diary.note));
+  const sourceIds = registered.map((diary) => diary.source_analysis_id).filter((id): id is string => Boolean(id));
+  const aiPoints = new Map<string, number>();
+  if (sourceIds.length) {
+    const { data: analyses } = await admin.from("video_analyses").select("id,result_json").in("id", sourceIds);
+    for (const analysis of analyses ?? []) aiPoints.set(analysis.id, aiPointsFromResult(analysis.result_json));
+  }
+  const totals = new Map<string, { points: number; diaryCount: number }>();
+  for (const diary of registered) {
+    const entry = totals.get(diary.workspace_id) ?? { points: 0, diaryCount: 0 };
+    entry.points += diary.source_analysis_id ? aiPoints.get(diary.source_analysis_id) ?? 0 : POINTS_PER_DIARY;
+    entry.diaryCount += 1;
+    totals.set(diary.workspace_id, entry);
   }
 
-  const aggregated = [...counts.entries()].map(([workspaceId, diaryCount]) => {
+  const aggregated = [...totals.entries()].map(([workspaceId, total]) => {
     const userId = owners.get(workspaceId) ?? "";
-    return { userId, workspaceId, diaryCount, points: diaryCount * POINTS_PER_DIARY };
+    return { userId, workspaceId, ...total };
   });
   aggregated.sort((a, b) => b.points - a.points || a.userId.localeCompare(b.userId));
 

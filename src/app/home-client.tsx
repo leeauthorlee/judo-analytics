@@ -8,7 +8,7 @@ import DiaryModal from "@/app/components/diary-modal";
 import RankingBoard from "@/app/components/ranking-board";
 import type { JudoAnalysisEvent } from "@/lib/analysis/types";
 import { isPendingDiary } from "@/lib/diary";
-import { POINTS_PER_DIARY, techniqueName } from "@/lib/scoring/policy";
+import { aiPointsFromResult, aiTechniqueId, POINTS_PER_DIARY, techniqueName } from "@/lib/scoring/policy";
 
 type Video = { id: string; original_name: string; size_bytes: number; status: string; created_at: string };
 type AnalysisEvent = JudoAnalysisEvent;
@@ -22,6 +22,14 @@ type Analysis = {
   analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
 };
 type Diary = { id: string; entry_date: string; title: string; note: string | null; created_at: string; thumbnailUrl: string | null };
+type LiveAnalysis = {
+  id: string;
+  videoId: string;
+  status: Analysis["status"];
+  error_code: string | null;
+  result_json: Analysis["result_json"];
+  analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
+};
 
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
 
@@ -67,19 +75,30 @@ export default function HomeClient({
   const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string } | null>(null);
   const [highlight, setHighlight] = useState<Diary | null>(null);
   const [freshStart, setFreshStart] = useState(false);
+  const [live, setLive] = useState<LiveAnalysis | null>(null);
 
   const activeVideo = videos[0] ?? null;
   const activeAnalysis = activeVideo ? analyses.find((item) => item.video_id === activeVideo.id) ?? null : null;
-  const review = activeAnalysis
-    ? (Array.isArray(activeAnalysis.analysis_reviews) ? activeAnalysis.analysis_reviews[0] : activeAnalysis.analysis_reviews ?? undefined)
+  const displayedAnalysis: Analysis | null = live
+    ? { id: live.id, video_id: live.videoId, status: live.status, error_code: live.error_code,
+        created_at: "", result_json: live.result_json, analysis_reviews: live.analysis_reviews }
+    : activeAnalysis;
+  const displayedVideoId = live?.videoId ?? activeVideo?.id ?? null;
+  const review = displayedAnalysis
+    ? (Array.isArray(displayedAnalysis.analysis_reviews) ? displayedAnalysis.analysis_reviews[0] : displayedAnalysis.analysis_reviews ?? undefined)
     : undefined;
-  const confirmedName = review ? (techniqueName(review.technique_label) ?? (review.technique_label === "unsupported" ? "지원 외 기술" : "확인 불가")) : null;
-  const points = review ? (techniqueName(review.technique_label) ? POINTS_PER_DIARY : 0) : 0;
-  const event = activeAnalysis?.result_json?.events?.[0];
-  const isRunning = activeAnalysis?.status === "queued" || activeAnalysis?.status === "processing";
+  const aiName = techniqueName(aiTechniqueId(displayedAnalysis?.result_json));
+  const confirmedName = review
+    ? (techniqueName(review.technique_label) ?? (review.technique_label === "unsupported" ? "지원 외 기술" : "확인 불가"))
+    : aiName;
+  const points = aiPointsFromResult(displayedAnalysis?.result_json);
+  const event = displayedAnalysis?.result_json?.events?.[0];
+  const isRunning = !live && (activeAnalysis?.status === "queued" || activeAnalysis?.status === "processing");
 
-  const phase = busy ? "uploading"
+  const phase = busy && !live ? "uploading"
     : file ? "select"
+    : live ? (live.status === "queued" || live.status === "processing" ? "analyzing"
+        : live.status === "failed" ? "failed" : "complete")
     : freshStart ? "upload"
     : isRunning ? "analyzing"
     : activeAnalysis?.status === "review_required" || activeAnalysis?.status === "completed" ? "complete"
@@ -87,7 +106,7 @@ export default function HomeClient({
     : "upload";
 
   const activeVideoIdRef = useRef<string | null>(null);
-  useEffect(() => { activeVideoIdRef.current = activeVideo?.id ?? null; }, [activeVideo?.id]);
+  useEffect(() => { activeVideoIdRef.current = displayedVideoId; }, [displayedVideoId]);
 
   useEffect(() => () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); }, []);
 
@@ -96,6 +115,29 @@ export default function HomeClient({
     const interval = window.setInterval(() => router.refresh(), 6000);
     return () => window.clearInterval(interval);
   }, [isRunning, router]);
+
+  // Poll the local job so the analyzing card appears immediately and results
+  // arrive without a full page refresh (which can move the scroll position).
+  useEffect(() => {
+    if (!live || (live.status !== "queued" && live.status !== "processing")) return;
+    let active = true;
+    const interval = window.setInterval(async () => {
+      try {
+        const response = await fetch(`/api/analyses/${live.id}`);
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!active || !data.analysis) return;
+        setLive((previous) => previous ? {
+          ...previous,
+          status: data.analysis.status,
+          error_code: data.analysis.error_code,
+          result_json: data.analysis.result_json,
+          analysis_reviews: data.analysis.analysis_reviews,
+        } : previous);
+      } catch { /* retry on the next tick */ }
+    }, 5000);
+    return () => { active = false; window.clearInterval(interval); };
+  }, [live]);
 
   // Best-effort release when leaving the page. The server TTL reaper is the
   // authoritative cleanup for cases where this signal cannot be delivered.
@@ -169,12 +211,22 @@ export default function HomeClient({
     } catch { return null; } finally { URL.revokeObjectURL(objectUrl); }
   }
 
+  // The hero link leaves a #analysis hash in the URL. Any later refresh would
+  // jump to that anchor, so remove it before mutating the page state.
+  function clearHash() {
+    if (window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }
+  function refreshWithoutScroll() { clearHash(); router.refresh(); }
+
   async function uploadAndQueue() {
     if (!file) return;
     if (!duration || duration > 600 || !Number.isFinite(startSeconds) || !Number.isFinite(endSeconds) ||
         startSeconds < 0 || endSeconds <= startSeconds || endSeconds > duration || endSeconds - startSeconds > 30) {
       setError("10분 이하 영상에서 30초 이내의 공격 구간을 선택해 주세요."); return;
     }
+    clearHash();
     setFreshStart(false);
     setBusy(true); setError(""); setMessage("");
     try {
@@ -215,8 +267,14 @@ export default function HomeClient({
       if (!analysisResponse.ok) throw new Error(analysisBody.error ?? "분석 작업을 등록하지 못했습니다.");
 
       setSelectedFile(null);
+      setLive({
+        id: analysisBody.analysis.id,
+        videoId: videoBody.video.id,
+        status: "queued",
+        error_code: null,
+        result_json: null,
+      });
       setMessage("AI가 선택 구간을 분석하고 있습니다. 결과는 이 화면에 표시됩니다.");
-      router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "업로드 또는 분석 요청에 실패했습니다.");
     } finally { setBusy(false); }
@@ -229,7 +287,7 @@ export default function HomeClient({
     const result = await response.json().catch(() => ({}));
     if (!response.ok) { setError(result.error ?? "일기를 삭제하지 못했습니다."); return; }
     setMessage("일기를 삭제했습니다. 랭킹 점수가 다시 집계됩니다.");
-    router.refresh();
+    refreshWithoutScroll();
   }
 
   async function startNewAnalysis() {
@@ -242,9 +300,10 @@ export default function HomeClient({
     }
     setSelectedFile(null);
     setDiaryModal(null);
+    setLive(null);
     setFreshStart(true);
     setMessage("이전 영상과 분석 결과를 정리했습니다. 새 영상을 선택해 주세요.");
-    router.refresh();
+    refreshWithoutScroll();
   }
 
   return (
@@ -285,7 +344,7 @@ export default function HomeClient({
           {phase === "failed" && (
             <div className="stage-card">
               <h3>분석에 실패했습니다</h3>
-              <p role="alert">{errorText(activeAnalysis?.error_code ?? null)}</p>
+              <p role="alert">{errorText(displayedAnalysis?.error_code ?? null)}</p>
               <div className="button-row">
                 <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
               </div>
@@ -323,46 +382,45 @@ export default function HomeClient({
             </div>
           )}
 
-          {phase === "complete" && activeAnalysis && activeVideo && (
+          {phase === "complete" && displayedAnalysis && displayedVideoId && (
             <div className="result-card">
               <p className="eyebrow">분석 완료</p>
               <div className="result-outcome">
                 <div>
                   <span className="result-label">최종 판단 기술</span>
-                  <strong className="result-technique">{confirmedName ?? "확인 전"}</strong>
+                  <strong className="result-technique">{confirmedName ?? "판별 불가"}</strong>
+                  <span className="point-note">AI 판단 기술: {aiName ?? "판별 불가"}</span>
                 </div>
                 <div>
                   <span className="result-label">획득 랭킹 점수</span>
                   <strong className="result-points">{points > 0 ? `+${points}점` : "0점"}</strong>
-                  <span className="point-note">일기 등록 시 적립 · 분석만으로는 반영되지 않습니다</span>
+                  <span className="point-note">AI 결과 기반 · 일기 등록 시 적립</span>
                 </div>
               </div>
 
               <div className="result-section">
-                <h4>AI 추천 결과 <small>모델 점수 · 확정 아님</small></h4>
-                <ol className="candidate-list">
-                  {(event?.techniqueCandidates ?? []).map((candidate) => (
-                    <li key={candidate.techniqueId}>
-                      <span>{techniqueName(candidate.techniqueId) ?? candidate.techniqueId}</span>
-                      <span>{(candidate.modelScore * 100).toFixed(1)}</span>
-                    </li>
-                  ))}
-                </ol>
-                <p className="result-note">분석 구간 {formatTime(event?.startMs ?? 0)}–{formatTime(event?.endMs ?? 0)} · 위 점수는 보정되지 않은 모델 점수이며 랭킹 점수와 다릅니다.</p>
+                <h4>분석 구간</h4>
+                <p className="result-note">{formatTime(event?.startMs ?? 0)}–{formatTime(event?.endMs ?? 0)} · AI가 판단한 최종 기술 하나만 표시합니다.</p>
               </div>
 
               <div className="result-section">
                 <h4>사용자 최종 확인</h4>
-                <AnalysisReviewForm analysisId={activeAnalysis.id} videoId={activeVideo.id} event={event ?? {
-                  startMs: 0, endMs: 0, techniqueId: null, score: "uncertain", toriRole: "unknown", ukeRole: "unknown",
-                  observations: [], missingEvidence: [], confidenceBand: "low",
-                }} review={review} />
+                <AnalysisReviewForm
+                  analysisId={displayedAnalysis.id}
+                  videoId={displayedVideoId}
+                  event={event ?? {
+                    startMs: 0, endMs: 0, techniqueId: null, score: "uncertain", toriRole: "unknown", ukeRole: "unknown",
+                    observations: [], missingEvidence: [], confidenceBand: "low",
+                  }}
+                  review={review}
+                  onSaved={(saved) => setLive((previous) => previous ? { ...previous, analysis_reviews: saved } : previous)}
+                />
               </div>
-              <p className="disclaimer">{activeAnalysis.result_json?.disclaimer ?? "experiment model · 공식 심판 판정이 아닙니다."}</p>
+              <p className="disclaimer">{displayedAnalysis.result_json?.disclaimer ?? "실험 모델 결과이며 공식 심판 판정이 아닙니다."}</p>
 
               <div className="button-row result-actions">
-                <button className="primary-button" type="button" disabled={!confirmedName || points === 0}
-                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: activeAnalysis.id, technique: confirmedName ?? "" })}>
+                <button className="primary-button" type="button" disabled={points === 0}
+                  onClick={() => setDiaryModal(isGuest ? null : { analysisId: displayedAnalysis.id, technique: confirmedName ?? aiName ?? "" })}>
                   일기에 등록하기
                 </button>
                 <button className="secondary-button" type="button" onClick={() => void startNewAnalysis()}>새로운 영상 분석하기</button>
@@ -380,7 +438,7 @@ export default function HomeClient({
           technique={diaryModal.technique}
           analysisId={diaryModal.analysisId}
           onClose={() => setDiaryModal(null)}
-          onSaved={(text) => { setDiaryModal(null); setMessage(text); router.refresh(); }}
+          onSaved={(text) => { setDiaryModal(null); setMessage(text); refreshWithoutScroll(); }}
         />
       )}
 
@@ -428,7 +486,7 @@ export default function HomeClient({
         <div className="section-heading">
           <p className="eyebrow">JUDO RANKING</p>
           <h2>유도 랭킹</h2>
-          <p>일기 1건당 {POINTS_PER_DIARY}점 · 등록된 일기 합계 기준</p>
+          <p>AI 분석 결과 기반 점수 · 일기 등록 시 합산 · 최대 {POINTS_PER_DIARY}점/건</p>
         </div>
         <RankingBoard isGuest={isGuest} />
       </section>

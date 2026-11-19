@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isGuestUser } from "@/lib/access";
 import { isPendingDiary, MAX_DIARY_CONTENT } from "@/lib/diary";
-import { POINTS_PER_DIARY, pointsForTechnique, techniqueName } from "@/lib/scoring/policy";
+import { aiPointsFromResult, aiTechniqueId, POINTS_PER_DIARY, techniqueName } from "@/lib/scoring/policy";
 
 export const runtime = "nodejs";
 
@@ -28,8 +28,17 @@ export async function GET() {
     .eq("workspace_id", workspace.id)
     .order("created_at", { ascending: false });
   if (error) return NextResponse.json({ error: "일기를 불러오지 못했습니다." }, { status: 500 });
-  const diaries = (data ?? []).filter((item) => !isPendingDiary(item.note))
-    .map((item) => ({ ...item, points: POINTS_PER_DIARY }));
+  const registered = (data ?? []).filter((item) => !isPendingDiary(item.note));
+  const sourceIds = registered.map((item) => item.source_analysis_id).filter((id): id is string => Boolean(id));
+  const points = new Map<string, number>();
+  if (sourceIds.length) {
+    const { data: analyses } = await supabase.from("video_analyses").select("id,result_json").in("id", sourceIds);
+    for (const analysis of analyses ?? []) points.set(analysis.id, aiPointsFromResult(analysis.result_json));
+  }
+  const diaries = registered.map((item) => ({
+    ...item,
+    points: item.source_analysis_id ? points.get(item.source_analysis_id) ?? 0 : POINTS_PER_DIARY,
+  }));
   return NextResponse.json({ diaries });
 }
 
@@ -71,8 +80,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "완료된 분석만 일기에 등록할 수 있습니다." }, { status: 409 });
     }
     const review = Array.isArray(analysis.analysis_reviews) ? analysis.analysis_reviews[0] : analysis.analysis_reviews;
-    const name = techniqueName(review?.technique_label);
-    if (!name) return NextResponse.json({ error: "확인된 기술이 없습니다. 먼저 기술을 확인해 주세요." }, { status: 409 });
+    // The AI's single final technique is the default; a saved user review wins.
+    const name = techniqueName(review?.technique_label) ?? techniqueName(aiTechniqueId(analysis.result_json));
+    if (!name) return NextResponse.json({ error: "AI가 판단한 기술이 없어 일기에 등록할 수 없습니다." }, { status: 409 });
 
     const { data: existing } = await supabase
       .from("diary_entries")
@@ -92,7 +102,7 @@ export async function POST(request: Request) {
         .select("id,entry_date,title,note,created_at,source_analysis_id")
         .single();
       if (error || !diary) return NextResponse.json({ error: "일기를 저장하지 못했습니다." }, { status: 500 });
-      return NextResponse.json({ diary, points: pointsForTechnique(review.technique_label) }, { status: 200 });
+      return NextResponse.json({ diary, points: aiPointsFromResult(analysis.result_json) }, { status: 200 });
     }
     const { data: diary, error } = await supabase
       .from("diary_entries")
@@ -106,7 +116,7 @@ export async function POST(request: Request) {
       .select("id,entry_date,title,note,created_at,source_analysis_id")
       .single();
     if (error || !diary) return NextResponse.json({ error: "일기를 저장하지 못했습니다." }, { status: 500 });
-    return NextResponse.json({ diary, points: pointsForTechnique(review.technique_label) }, { status: 201 });
+    return NextResponse.json({ diary, points: aiPointsFromResult(analysis.result_json) }, { status: 201 });
   }
 
   // Manual diary (kept for backwards compatibility).
