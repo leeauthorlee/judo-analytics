@@ -2,6 +2,7 @@ import { head } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { releaseVideo } from "@/lib/video-cleanup";
 
 export const runtime = "nodejs";
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
@@ -82,4 +83,26 @@ export async function POST(request: Request) {
     console.error("VIDEO_SAVE_FAILED", cause);
     return NextResponse.json({ error: `저장된 영상 정보를 확인하지 못했습니다: ${cause instanceof Error ? cause.message : "unknown"}` }, { status: 404 });
   }
+}
+
+/** Clears every remaining temporary video for the actor (new-analysis reset). */
+export async function DELETE() {
+  if (!isSupabaseConfigured() || !process.env.BLOB_READ_WRITE_TOKEN) {
+    return NextResponse.json({ error: "저장소 설정이 필요합니다." }, { status: 503 });
+  }
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+
+  const { data: videos, error } = await supabase.from("video_assets").select("id").is("deleted_at", null);
+  if (error) return NextResponse.json({ error: "영상 목록을 조회하지 못했습니다." }, { status: 500 });
+
+  let deleted = 0;
+  let failed = 0;
+  for (const video of videos ?? []) {
+    const result = await releaseVideo(supabase, video.id);
+    if (result.ok) deleted += 1; else failed += 1;
+  }
+  if (failed) return NextResponse.json({ error: "일부 영상을 삭제하지 못했습니다.", deleted, failed }, { status: 502 });
+  return NextResponse.json({ deleted });
 }

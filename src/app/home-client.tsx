@@ -66,6 +66,7 @@ export default function HomeClient({
   const [endSeconds, setEndSeconds] = useState(0);
   const [diaryModal, setDiaryModal] = useState<{ analysisId: string; technique: string } | null>(null);
   const [highlight, setHighlight] = useState<Diary | null>(null);
+  const [freshStart, setFreshStart] = useState(false);
 
   const activeVideo = videos[0] ?? null;
   const activeAnalysis = activeVideo ? analyses.find((item) => item.video_id === activeVideo.id) ?? null : null;
@@ -79,6 +80,7 @@ export default function HomeClient({
 
   const phase = busy ? "uploading"
     : file ? "select"
+    : freshStart ? "upload"
     : isRunning ? "analyzing"
     : activeAnalysis?.status === "review_required" || activeAnalysis?.status === "completed" ? "complete"
     : activeAnalysis?.status === "failed" ? "failed"
@@ -173,6 +175,7 @@ export default function HomeClient({
         startSeconds < 0 || endSeconds <= startSeconds || endSeconds > duration || endSeconds - startSeconds > 30) {
       setError("10분 이하 영상에서 30초 이내의 공격 구간을 선택해 주세요."); return;
     }
+    setFreshStart(false);
     setBusy(true); setError(""); setMessage("");
     try {
       let actorId = userId;
@@ -231,16 +234,15 @@ export default function HomeClient({
 
   async function startNewAnalysis() {
     setError(""); setMessage("");
-    if (activeVideo) {
-      const response = await fetch(`/api/videos/${activeVideo.id}`, { method: "DELETE" });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setError(result.error ?? "이전 영상을 삭제하지 못했습니다. 결과를 유지합니다.");
-        return;
-      }
+    const response = await fetch("/api/videos", { method: "DELETE" });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setError(result.error ?? "이전 영상을 삭제하지 못했습니다. 결과를 유지합니다.");
+      return;
     }
     setSelectedFile(null);
     setDiaryModal(null);
+    setFreshStart(true);
     setMessage("이전 영상과 분석 결과를 정리했습니다. 새 영상을 선택해 주세요.");
     router.refresh();
   }
