@@ -15,7 +15,8 @@ type DiaryWithThumb = {
 export default async function Home() {
   const viewer = await getViewer();
   const email = viewer?.email ?? null;
-  const isGuest = viewer?.isGuest ?? false;
+  // A visitor without any session is treated like a guest in the UI.
+  const isGuest = viewer ? viewer.isGuest : true;
   let videos: Awaited<ReturnType<typeof getVideos>> = [];
   let analyses: Awaited<ReturnType<typeof getAnalyses>> = [];
   let diariesWithThumb: DiaryWithThumb[] = [];

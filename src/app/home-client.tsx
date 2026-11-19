@@ -175,13 +175,22 @@ export default function HomeClient({
     }
     setBusy(true); setError(""); setMessage("");
     try {
-      const pathname = `workspaces/${userId}/${crypto.randomUUID()}.mp4`;
+      let actorId = userId;
+      if (!actorId) {
+        const sessionResponse = await fetch("/api/auth/guest", { method: "POST" });
+        const session = await sessionResponse.json();
+        if (!sessionResponse.ok || typeof session.userId !== "string") {
+          throw new Error(session.error ?? "임시 세션을 만들지 못했습니다.");
+        }
+        actorId = session.userId;
+      }
+      const pathname = `workspaces/${actorId}/${crypto.randomUUID()}.mp4`;
       await upload(pathname, file, { access: "private", handleUploadUrl: "/api/uploads", contentType: "video/mp4", multipart: true });
 
       let thumbnailKey: string | null = null;
       const thumb = await createThumbnail(file);
       if (thumb) {
-        thumbnailKey = `workspaces/${userId}/${crypto.randomUUID()}.jpg`;
+        thumbnailKey = `workspaces/${actorId}/${crypto.randomUUID()}.jpg`;
         await upload(thumbnailKey, thumb, { access: "private", handleUploadUrl: "/api/uploads", contentType: "image/jpeg" });
       }
 

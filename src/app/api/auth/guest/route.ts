@@ -44,7 +44,7 @@ export async function POST() {
     });
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    return NextResponse.json({ guest: true }, { status: 201 });
+    return NextResponse.json({ guest: true, userId: created.user.id }, { status: 201 });
   } catch (cause) {
     console.error("GUEST_SESSION_LOGIN_FAILED", cause);
     await admin.auth.admin.deleteUser(created.user.id);
