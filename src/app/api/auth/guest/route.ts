@@ -17,7 +17,8 @@ export async function POST() {
   }
 
   const email = `guest-${crypto.randomUUID()}@judo.local`;
-  const password = `${crypto.randomUUID()}${crypto.randomUUID()}Aa1!`;
+  // Supabase caps password length at 72 bytes; a UUID plus suffix is enough entropy.
+  const password = `${crypto.randomUUID()}Aa1!`;
   const admin = createAdminClient();
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
