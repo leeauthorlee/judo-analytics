@@ -120,12 +120,17 @@ npm install
 `.env.example`을 참고해 `.env.local`을 만들고 다음 값을 설정합니다.
 
 ```dotenv
-JUDO_UPLOAD_PASSWORD=긴-임의-비밀번호
-JUDO_SESSION_SECRET=최소-32자-이상의-임의-비밀값
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=서버 전용 키 (게스트 세션·랭킹 집계)
 BLOB_READ_WRITE_TOKEN=Vercel-Blob-읽기쓰기-토큰
+GOOGLE_CLOUD_*=Google Cloud Tasks / WIF 설정
+WORKER_API_SECRET=워커와 공유하는 비밀값
+CRON_SECRET=임시 영상 정리 cron 비밀값
+VIDEO_TTL_HOURS=24
 ```
 
-Vercel Dashboard에서 Blob store를 만들고 개발 환경용 토큰을 설정해야 업로드가 동작합니다. 설정 없이도 UI는 실행되지만, 업로드 API는 오류를 표시합니다. 이 초기 버전은 분석 결과를 저장하지 않으며 모델이 연결되지 않았다는 상태만 반환합니다.
+Vercel Dashboard에서 Blob store를 만들고 토큰을 설정해야 업로드가 동작합니다. 비로그인 방문자는 `/api/auth/guest`로 서버가 발급한 임시 세션을 받아 영상 분석만 이용할 수 있으며, 일기·랭킹 API는 403을 반환합니다. 분석 결과의 랭킹 점수는 일기 등록 시에만 확정됩니다.
 
 ```bash
 npm run dev
