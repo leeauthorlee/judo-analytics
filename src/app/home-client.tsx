@@ -354,7 +354,7 @@ export default function HomeClient({
       <section className="hero" id="top">
         <div className="hero-copy">
           <p className="eyebrow">JUDO VIDEO REVIEW</p>
-          <h1>기술을 다시 보고,<br />착지를 직접 확인하다.</h1>
+          <h1>유능제강, 부드러운 기술이<br />강함을 이긴다.</h1>
           <p className="hero-description">
             선택한 공격 구간에서 AI가 기술 후보를 추천합니다.<br />
             착지와 득점은 영상을 보고 직접 확인합니다.

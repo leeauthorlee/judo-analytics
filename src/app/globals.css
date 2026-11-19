@@ -83,7 +83,8 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 /* Hero */
 .hero {
   min-height: 640px;
-  padding: 90px clamp(20px, 5vw, 76px);
+  /* Match the left text edge of .section (max-width 1120px + 28px padding). */
+  padding: 90px max(28px, calc((100vw - 1120px) / 2 + 28px));
   position: relative;
   overflow: hidden;
   display: flex;
