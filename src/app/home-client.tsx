@@ -21,7 +21,10 @@ type Analysis = {
   result_json: { events?: AnalysisEvent[]; provider?: string; providerVersion?: string; disclaimer?: string } | null;
   analysis_reviews?: AnalysisReview | AnalysisReview[] | null;
 };
-type Diary = { id: string; entry_date: string; title: string; note: string | null; created_at: string; thumbnailUrl: string | null; points: number };
+type Diary = {
+  id: string; entry_date: string; title: string; note: string | null;
+  created_at: string; thumbnailUrl: string | null; points: number; videoId: string | null;
+};
 type LiveAnalysis = {
   id: string;
   videoId: string;
@@ -32,6 +35,23 @@ type LiveAnalysis = {
 };
 
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
+
+function DiaryCard({ diary, onDelete }: { diary: Diary; onDelete: (id: string) => void }) {
+  return (
+    <article className="diary-entry">
+      <time className="diary-date">{diary.entry_date}</time>
+      {diary.videoId && (
+        <video className="diary-video" controls preload="metadata"
+          poster={diary.thumbnailUrl ?? undefined}
+          src={`/api/videos/${diary.videoId}/media`} />
+      )}
+      <h4>{diary.title}</h4>
+      {diary.note && <p>{diary.note}</p>}
+      <span className="diary-points">+{diary.points}점</span>
+      <button className="text-button" type="button" onClick={() => onDelete(diary.id)}>일기 삭제</button>
+    </article>
+  );
+}
 
 function formatSize(size: number) { return `${(size / (1024 * 1024)).toFixed(1)} MB`; }
 function errorText(code: string | null) {
@@ -477,13 +497,7 @@ export default function HomeClient({
           <>
             <h3 className="subheading">오늘의 하이라이트</h3>
             {highlight ? (
-              <article className="diary-entry highlight-card">
-                {highlight.thumbnailUrl && <div className="diary-thumb" style={{ backgroundImage: `url("${highlight.thumbnailUrl}")` }} aria-hidden="true" />}
-                <span>{highlight.entry_date}</span>
-                <h4>{highlight.title}</h4>
-                {highlight.note && <p>{highlight.note}</p>}
-                <span className="diary-points">+{highlight.points}점</span>
-              </article>
+              <DiaryCard diary={highlight} onDelete={(id) => void deleteDiary(id)} />
             ) : (
               <p className="empty-state">등록된 일기가 없습니다. 분석 결과를 일기에 등록해 보세요.</p>
             )}
@@ -493,14 +507,7 @@ export default function HomeClient({
             ) : (
               <div className="diary-list">
                 {registeredDiaries.map((diary) => (
-                  <article className="diary-entry" key={diary.id}>
-                    {diary.thumbnailUrl && <div className="diary-thumb" style={{ backgroundImage: `url("${diary.thumbnailUrl}")` }} aria-hidden="true" />}
-                    <span>{diary.entry_date}</span>
-                    <h4>{diary.title}</h4>
-                    {diary.note && <p>{diary.note}</p>}
-                    <span className="diary-points">+{diary.points}점</span>
-                    <button className="text-button" type="button" onClick={() => void deleteDiary(diary.id)}>일기 삭제</button>
-                  </article>
+                  <DiaryCard key={diary.id} diary={diary} onDelete={(id) => void deleteDiary(id)} />
                 ))}
               </div>
             )}

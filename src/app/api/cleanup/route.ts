@@ -2,6 +2,7 @@ import { del } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isPendingDiary } from "@/lib/diary";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,13 +29,16 @@ async function runCleanup() {
   }
 
   for (const video of videos ?? []) {
-    const { data: active } = await admin
+    const { data: analyses } = await admin
       .from("video_analyses")
-      .select("id")
-      .eq("video_id", video.id)
-      .in("status", ["queued", "processing"])
-      .limit(1);
-    if (active?.length) continue;
+      .select("id,status")
+      .eq("video_id", video.id);
+    if (analyses?.some((a) => a.status === "queued" || a.status === "processing")) continue;
+    const analysisIds = (analyses ?? []).map((a) => a.id);
+    const { data: diaries } = analysisIds.length
+      ? await admin.from("diary_entries").select("note").in("source_analysis_id", analysisIds)
+      : { data: [] };
+    if (diaries?.some((d) => !isPendingDiary(d.note))) continue;
     try {
       await del(video.storage_key, { token: process.env.BLOB_READ_WRITE_TOKEN });
       result.videosDeleted += 1;

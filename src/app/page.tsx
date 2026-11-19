@@ -12,6 +12,7 @@ type DiaryWithThumb = {
   created_at: string;
   thumbnailUrl: string | null;
   points: number;
+  videoId: string | null;
 };
 
 export default async function Home() {
@@ -52,9 +53,13 @@ export default async function Home() {
         }
         const sourceIds = [...new Set(diaries.map((diary) => diary.source_analysis_id).filter((id): id is string => Boolean(id)))];
         const pointsById = new Map<string, number>();
+        const videoByAnalysis = new Map<string, string>();
         if (sourceIds.length) {
-          const { data: sourceAnalyses } = await supabase.from("video_analyses").select("id,result_json").in("id", sourceIds);
-          for (const analysis of sourceAnalyses ?? []) pointsById.set(analysis.id, aiPointsFromResult(analysis.result_json));
+          const { data: sourceAnalyses } = await supabase.from("video_analyses").select("id,video_id,result_json").in("id", sourceIds);
+          for (const analysis of sourceAnalyses ?? []) {
+            pointsById.set(analysis.id, aiPointsFromResult(analysis.result_json));
+            videoByAnalysis.set(analysis.id, analysis.video_id);
+          }
         }
         diariesWithThumb = diaries.map((diary) => ({
           id: diary.id,
@@ -64,6 +69,7 @@ export default async function Home() {
           created_at: diary.created_at,
           thumbnailUrl: diaryThumbnails.get(diary.id) ?? null,
           points: diary.source_analysis_id ? pointsById.get(diary.source_analysis_id) ?? 0 : POINTS_PER_DIARY,
+          videoId: diary.source_analysis_id ? videoByAnalysis.get(diary.source_analysis_id) ?? null : null,
         }));
       }
     }

@@ -198,8 +198,10 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .form-panel legend { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
 .highlight-choice { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--body); }
 .form-panel .primary-button { justify-self: start; }
-.diary-list { margin-top: 32px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
-.diary-entry { display: grid; gap: 8px; align-content: start; }
+.diary-list { margin-top: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.diary-entry { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 16px; border: 1px solid var(--line); background: #fff; }
+.diary-date { color: var(--muted); font-size: 12px; }
+.diary-video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--ink); }
 .diary-thumb { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; background-color: var(--ash); }
 .result-card { max-width: 720px; padding: 32px; background: var(--ash); display: grid; gap: 8px; }
 .result-card strong { font-size: 20px; font-weight: 500; }
@@ -298,6 +300,7 @@ footer p { margin: 0; color: var(--ink); font-size: 14px; font-weight: 500; }
 @media (max-width: 900px) {
   .ranking-layout { grid-template-columns: 1fr; gap: 48px; }
   .how-grid { grid-template-columns: 1fr; gap: 32px; }
+  .diary-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {
